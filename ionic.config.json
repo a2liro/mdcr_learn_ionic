@@ -1,0 +1,7 @@
+{
+  "name": "mdcrlearn",
+  "integrations": {
+    "capacitor": {}
+  },
+  "type": "vue-vite"
+}
