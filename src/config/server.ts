@@ -1,2 +1,2 @@
-const server = 'http://192.168.0.109:8080'
+const server = 'http://192.168.0.9:8080'
 export default server;

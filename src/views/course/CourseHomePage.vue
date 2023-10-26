@@ -102,6 +102,8 @@ const email = ref('andreliro1945@gmail.com');
 const password = ref('12345678');
 const course = ref([])
 const route = useRoute();
+const router = useIonRouter();
+
 const alertButtons = ref([
   {
     text: 'Não',
@@ -124,7 +126,9 @@ onIonViewDidEnter(async () => {
 const startNewDeck = function (ev: CustomEvent, deckId: any) {
   console.log(deckId, ev, JSON.stringify(ev.detail));
   console.log(`Dismissed with role: ${ev.detail.role}`);
-
+  if(ev.detail.role == 'confirm') {
+    router.push('/deck/play/' + deckId)
+  }
 }
 
 </script>

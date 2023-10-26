@@ -25,7 +25,11 @@ const routes: Array<RouteRecordRaw> = [
   {
     path: '/courses/home/:id',
     component: () => import ('../views/course/CourseHomePage.vue')
-  }
+  },
+  {
+    path: '/deck/play/:id',
+    component: () => import ('../views/deck/DeckPlayFront.vue')
+  },
 ]
 
 const router = createRouter({
