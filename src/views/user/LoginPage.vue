@@ -19,6 +19,7 @@
         </ion-item>
         <ion-button color="primary" @click="login">Login</ion-button>
       </div>
+      {{ user }}
     </ion-content>
   </ion-page>
 </template>
@@ -42,11 +43,12 @@ import { ref } from 'vue';
 
 const email = ref('andreliro1945@gmail.com');
 const password = ref('12345678');
+const user = ref({})
 
 const router = useIonRouter();
 
 async function login() {
-  const user = await userService.login(email.value, password.value);
+   user.value = await userService.login(email.value, password.value);
   if(user) {
     router.navigate('/courses');
   }

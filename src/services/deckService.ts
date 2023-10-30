@@ -1,8 +1,8 @@
 import axios from "axios";
 import { Storage } from '@ionic/storage';
 import userStore from "@/stores/userStore";
-// import deckStore from "@/stores/deckStore";
 import server from "@/config/server";
+import cardStore from "@/stores/cardStore";
 
 
 const deckService = {
@@ -20,7 +20,7 @@ const deckService = {
         console.log(response);
 
         
-        // await deckStore.setDeck(response.data.decks);
+        await cardStore.setCard(response.data.card);
         return response.data
     },
 }

@@ -28,6 +28,10 @@ const routes: Array<RouteRecordRaw> = [
   },
   {
     path: '/deck/play/:id',
+    component: () => import ('../views/deck/DeckPlayAudio.vue')
+  },
+  {
+    path: '/deck/play/front/:id',
     component: () => import ('../views/deck/DeckPlayFront.vue')
   },
 ]
