@@ -11,8 +11,8 @@
 
     <ion-content :fullscreen="true">
       <div id="container">
-        <audio controls autoplay v-if="deck?.card?.audiofile">
-          <source :src="server + '/' + deck?.card?.audiofile" type="audio/mpeg">
+        <audio controls autoplay v-if="card?.audiofile">
+          <source :src="server + '/' + card?.audiofile" type="audio/mpeg">
           Your browser does not support the audio element.
         </audio>
 
@@ -21,7 +21,7 @@
     <ion-footer>
       <ion-toolbar>
         <ion-title>
-          <ion-button expand="block" fill="outline" @click="$router.push('/deck/play/front/' + deck.card.id)">
+          <ion-button expand="block" fill="outline" @click="$router.push('/deck/play/front/' + card.id)">
             Continue
             <ion-icon slot="end" :icon="chevronForward"></ion-icon>
           </ion-button>
@@ -65,6 +65,8 @@ import courseService from '@/services/courseService';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
 import { Swiper, SwiperSlide } from 'swiper/vue';
+import cardStore from '@/stores/cardStore';
+
 
 
 // import { Navigation } from 'swiper/modules';
@@ -73,20 +75,13 @@ import { Swiper, SwiperSlide } from 'swiper/vue';
 import { ref } from 'vue';
 import server from '@/config/server';
 import { useRoute } from 'vue-router';
-import deckService from '@/services/deckService';
-const email = ref('andreliro1945@gmail.com');
-const password = ref('12345678');
-const deck = ref([])
 const route = useRoute();
+const card = ref([])
 
 const audioAsset = ref({});
 
 onIonViewDidEnter(async () => {
-
-
-  console.log('teste', route.params.id);
-  deck.value = await deckService.playDeck(route.params.id) //await deckService.playDeck(route.params.id);
-  console.log('ccccccccccccc', deck.value)
+  card.value = await cardStore.getCard();
 });
 
 </script>

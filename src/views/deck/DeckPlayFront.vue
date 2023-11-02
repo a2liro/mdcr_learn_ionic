@@ -149,7 +149,6 @@ let hasPermissions: any;
 onIonViewDidEnter(async () => {
 
   card.value = await cardStore.getCard();
-  console.log(card.value)
 
   const newEditor = ref()
   newEditor.value = document.getElementById('editor');

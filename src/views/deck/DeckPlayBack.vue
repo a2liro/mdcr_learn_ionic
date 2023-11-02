@@ -46,11 +46,11 @@
             <ion-col class="ion-text-end">Difícil</ion-col>
           </ion-row>
           <ion-row>
-            <ion-col><ion-button expand="block" color="success" size="default">{{ card.intervals[1] }}</ion-button></ion-col>
-            <ion-col><ion-button expand="block" color="secondary" size="default">{{ card.intervals[2] }}</ion-button></ion-col>
-            <ion-col><ion-button expand="block" color="medium" size="default">{{ card.intervals[3] }}</ion-button></ion-col>
-            <ion-col><ion-button expand="block" color="warning" size="default">{{ card.intervals[4] }}</ion-button></ion-col>
-            <ion-col><ion-button expand="block" color="danger" size="default">{{ card.intervals[5] }}</ion-button></ion-col>
+            <ion-col><ion-button expand="block" color="success" size="default" @click="sendNote(1)">{{ card.intervals[1] }}</ion-button></ion-col>
+            <ion-col><ion-button expand="block" color="secondary" size="default" @click="sendNote(2)">{{ card.intervals[2] }}</ion-button></ion-col>
+            <ion-col><ion-button expand="block" color="medium" size="default" @click="sendNote(3)">{{ card.intervals[3] }}</ion-button></ion-col>
+            <ion-col><ion-button expand="block" color="warning" size="default" @click="sendNote(4)">{{ card.intervals[4] }}</ion-button></ion-col>
+            <ion-col><ion-button expand="block" color="danger" size="default" @click="sendNote(5)">{{ card.intervals[5] }}</ion-button></ion-col>
           </ion-row>
           <!-- <ion-row>
             <ion-col><ion-button expand="block" color="secondary" size="default">Fácil ({{ card.intervals[2] }})</ion-button></ion-col>
@@ -88,11 +88,16 @@ import {
   IonIcon,
   IonRow,
   IonCol,
-  IonGrid
+  IonGrid,
+  useIonRouter,
 } from '@ionic/vue';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
 import { chevronForward } from 'ionicons/icons';
+import cardService from '@/services/cardService';
+
+const router = useIonRouter();
+
 
 
 import { ref, watch } from 'vue';
@@ -120,9 +125,7 @@ const newEditorBack = ref()
 
 onIonViewDidEnter(async () => {
   card.value = await cardStore.getCard();
-  console.log(card.value)
   quillBackStart()
-
 });
 
 
@@ -141,6 +144,15 @@ const quillBackStart = function () {
     theme: 'bubble',
   });
   quillBack.setContents(JSON.parse(card.value.back));
+}
+
+const sendNote = async function(note: any) {
+  try {
+    const response = await cardService.sendNote(card.value.deck_id, card.value.id, note)
+    router.push('/deck/play/' + card.value.deck_id)
+  }catch(error) {
+    console.log(error)
+  }
 }
 </script>
 

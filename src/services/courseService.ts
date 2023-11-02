@@ -17,9 +17,6 @@ const courseService = {
             },
         };
         const response = await axios.get(server + '/api/courses', config);
-        console.log(response);
-
-        
         await courseStore.setCourse(response.data.courses);
         return response.data.courses
     },
@@ -33,8 +30,6 @@ const courseService = {
             },
         };
         const response = await axios.get(server + '/api/courses/show/' + id, config);
-        console.log(response);
-
         
         await courseStore.setCourse(response.data);
         return response.data

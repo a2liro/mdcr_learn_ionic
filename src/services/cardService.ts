@@ -5,9 +5,9 @@ import server from "@/config/server";
 import cardStore from "@/stores/cardStore";
 
 
-const deckService = {
+const cardService = {
 
-    playDeck: async function (id: any) {
+    sendNote: async function (deckId: any, cardId: any, note: any) {
         const user = await userStore.getUser();
         
         const config = {
@@ -16,11 +16,11 @@ const deckService = {
                 Authorization: 'Baerer ' + user.token
             },
         };
-        const response = await axios.get(server + '/api/decks/play/' + id, config);
-        
+        const response = await axios.get(`${server}/api/decks/${deckId}/cards/${cardId}/note/${note}`, config);
         await cardStore.setCard(response.data.card);
+
         return response.data
     },
 }
 
-export default deckService;
+export default cardService;

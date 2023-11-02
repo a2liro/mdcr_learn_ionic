@@ -14,8 +14,6 @@ const userService = {
             },
         };
         const response = await axios.post(server + '/api/login', data, config);
-
-        console.log(response);
         await userStore.setUser(response.data.user);
         return response;
     },

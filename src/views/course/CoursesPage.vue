@@ -61,14 +61,10 @@ import courseService from '@/services/courseService';
 
 import { ref } from 'vue';
 import server from '@/config/server';
-const email = ref('andreliro1945@gmail.com');
-const password = ref('12345678');
 const courses = ref([])
 
 onIonViewDidEnter(async () => {
-  console.log('teste');
   courses.value = await courseService.getCourses();
-  console.log('ccccccccccccc', courses.value)
 });
 
 </script>

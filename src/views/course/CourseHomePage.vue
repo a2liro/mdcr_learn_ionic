@@ -98,6 +98,7 @@ import { Swiper, SwiperSlide } from 'swiper/vue';
 import { ref } from 'vue';
 import server from '@/config/server';
 import { useRoute } from 'vue-router';
+import deckService from '@/services/deckService';
 const email = ref('andreliro1945@gmail.com');
 const password = ref('12345678');
 const course = ref([])
@@ -118,15 +119,12 @@ const alertButtons = ref([
 ])
 
 onIonViewDidEnter(async () => {
-  console.log('teste', route.params.id);
   course.value = await courseService.getCourseData(route.params.id);
-  console.log('ccccccccccccc', course.value)
 });
 
-const startNewDeck = function (ev: CustomEvent, deckId: any) {
-  console.log(deckId, ev, JSON.stringify(ev.detail));
-  console.log(`Dismissed with role: ${ev.detail.role}`);
+const startNewDeck = async function (ev: CustomEvent, deckId: any) {
   if(ev.detail.role == 'confirm') {
+    await deckService.playDeck(route.params.id)
     router.push('/deck/play/' + deckId)
   }
 }
