@@ -28,20 +28,39 @@
               </div>
             </ion-card-content>
           </ion-card>
-          <ion-card>
+          <ion-card id="card-practice">
             <ion-card-header>
-              <ion-card-title>Frente:</ion-card-title>
+              <ion-card-title>Praticar</ion-card-title>
               <!-- <ion-card-subtitle>Frente:</ion-card-subtitle> -->
             </ion-card-header>
 
             <ion-card-content>
-              Gravando -- {{ speechResult }} -- 
+              Resultado: {{ speechResult }}
+              <ion-button expand="block" @click="startRecognition" v-if="isListening" color="danger">
+                Parar
+                <ion-icon slot="end" :icon="square"></ion-icon>
+              </ion-button>
+              <ion-button expand="block" @click="startRecognition" v-else>
+                Praticar
+                <ion-icon slot="end" :icon="micOutline"></ion-icon>
+              </ion-button>
+
             </ion-card-content>
           </ion-card>
         </div>
 
       </div>
     </ion-content>
+    <ion-footer>
+      <ion-toolbar>
+        <ion-title>
+          <ion-button expand="block" fill="outline" @click="$router.push('/deck/play/back/' + card.id)">
+            Continue
+            <ion-icon slot="end" :icon="chevronForward"></ion-icon>
+          </ion-button>
+        </ion-title>
+      </ion-toolbar>
+    </ion-footer>
   </ion-page>
 </template>
 
@@ -68,16 +87,19 @@ import {
   IonGrid,
   IonRow,
   useIonRouter,
-  IonAlert
+  IonAlert,
+  IonFooter,
+  IonIcon
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import courseService from '@/services/courseService';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
 import { Swiper, SwiperSlide } from 'swiper/vue';
+import { micOutline, square, chevronForward } from 'ionicons/icons';
 
 
-import { ref } from 'vue';
+import { ref, watch } from 'vue';
 import server from '@/config/server';
 import { useRoute } from 'vue-router';
 import cardStore from '@/stores/cardStore';
@@ -93,10 +115,10 @@ import { isPlatform } from '@ionic/vue';
 
 
 const editor = ref();
-const _content = ref('teste');
+const _content = ref('');
 let quill: Quill;
 
-const speechResult = ref('teste')
+const speechResult = ref('')
 
 
 // Quill.register({
@@ -120,6 +142,10 @@ const route = useRoute();
 
 const audioAsset = ref({});
 
+const isListening = ref(false);
+
+let hasPermissions: any;
+
 onIonViewDidEnter(async () => {
 
   card.value = await cardStore.getCard();
@@ -137,29 +163,41 @@ onIonViewDidEnter(async () => {
   if (isPlatform('android') || isPlatform('ios')) {
     const availableRec = await SpeechRecognition.available()
     if (availableRec.available === true) {
-      const hasPermissions = await SpeechRecognition.checkPermissions()
-      alert(JSON.stringify(hasPermissions)); // if prompt = negado
+      hasPermissions = await SpeechRecognition.checkPermissions()
 
-      SpeechRecognition.requestPermissions();
+      if (hasPermissions.speechRecognition !== 'granted') {
+        SpeechRecognition.requestPermissions();
+      }
 
-      SpeechRecognition.start({
-        language: "en-US",
-        maxResults: 1,
-        prompt: "Fale o texto em inglês",
-        partialResults: true,
-        popup: false,
-      });
 
       SpeechRecognition.addListener("partialResults", (data: any) => {
-        // alert("partialResults was fired" + data.matches);
         speechResult.value = data.matches
       });
-      
-      // alert(SpeechRecognitionResult)
-      // speechResult.value = SpeechRecognitionResult.toString()
+
     }
   }
 });
+
+const startRecognition = async function () {
+  alert(hasPermissions.speechRecognition);
+  if (hasPermissions.speechRecognition !== 'granted') {
+    SpeechRecognition.requestPermissions();
+  }
+  isListening.value = true;
+  SpeechRecognition.start({
+    language: "en-US",
+    maxResults: 1,
+    prompt: "Fale o texto em inglês",
+    partialResults: false,
+    popup: false,
+  }).then((value) => {
+    isListening.value = false;
+    speechResult.value = value.matches[0]
+  }).catch((error) => {
+    alert('Não foi possível ouvir sua voz, tente novamente')
+    isListening.value = false;
+  });
+}
 
 </script>
 
@@ -208,5 +246,9 @@ button.alert-button.alert-button-confirm {
 .ios button.alert-button.alert-button-confirm {
   border-bottom-right-radius: 13px;
   border-top-right-radius: 13px;
+}
+
+#card-practice {
+  margin-top: 2.5em;
 }
 </style>

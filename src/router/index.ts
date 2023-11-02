@@ -34,6 +34,10 @@ const routes: Array<RouteRecordRaw> = [
     path: '/deck/play/front/:id',
     component: () => import ('../views/deck/DeckPlayFront.vue')
   },
+  {
+    path: '/deck/play/back/:id',
+    component: () => import ('../views/deck/DeckPlayBack.vue')
+  },
 ]
 
 const router = createRouter({

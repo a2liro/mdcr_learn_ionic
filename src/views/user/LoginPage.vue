@@ -19,7 +19,6 @@
         </ion-item>
         <ion-button color="primary" @click="login">Login</ion-button>
       </div>
-      {{ user }}
     </ion-content>
   </ion-page>
 </template>

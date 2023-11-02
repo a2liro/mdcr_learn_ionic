@@ -58,7 +58,7 @@ import {
   IonFooter,
   IonIcon
 } from '@ionic/vue';
-import { star, chevronForward } from 'ionicons/icons';
+import { chevronForward } from 'ionicons/icons';
 
 import userService from '@/services/userService';
 import courseService from '@/services/courseService';

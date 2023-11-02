@@ -14,7 +14,6 @@
         <ion-grid>
           <ion-row>
             <ion-col size="12" size-md="4" size-lg="3" v-for="course in courses" :key="course">
-            {{ course.id }}
               <ion-card @click="$router.push('/courses/home/' + course.id)">
                 <img alt="Course logo" :src="server + '/' + course.thumbnail" />
                 <ion-card-header>
