@@ -24,7 +24,7 @@
 
             <ion-card-content>
               <div class="quill-editor">
-                <div :ref="editor" class="user-editor" id="editor"></div>
+                <div :ref="editor" class="user-editor" :id="`editor-${randId}`"></div>
               </div>
             </ion-card-content>
           </ion-card>
@@ -65,6 +65,9 @@
 </template>
 
 <script setup lang="ts">
+
+const email = ref('andreliro1945@gmail.com');
+const password = ref('12345678');
 import {
   IonButtons,
   IonContent,
@@ -120,6 +123,8 @@ let quill: Quill;
 
 const speechResult = ref('')
 
+const randId = ref(Math.random())
+
 
 // Quill.register({
 //   'modules/toolbar': Toolbar,
@@ -133,10 +138,6 @@ const speechResult = ref('')
 
 // var quill = new Quill('#editor');]
 
-
-
-const email = ref('andreliro1945@gmail.com');
-const password = ref('12345678');
 const card = ref([])
 const route = useRoute();
 
@@ -151,7 +152,8 @@ onIonViewDidEnter(async () => {
   card.value = await cardStore.getCard();
 
   const newEditor = ref()
-  newEditor.value = document.getElementById('editor');
+  newEditor.value = document.getElementById(`editor-${randId.value}`);
+  console.log(`editor-${card.value.id}`, newEditor.value);
 
   quill = new Quill(newEditor.value, {
     theme: 'bubble',

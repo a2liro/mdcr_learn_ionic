@@ -19,7 +19,7 @@ const deckService = {
         const response = await axios.get(server + '/api/decks/play/' + id, config);
         
         await cardStore.setCard(response.data.card);
-        return response.data
+        return response.data.card
     },
 }
 

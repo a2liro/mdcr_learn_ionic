@@ -21,15 +21,17 @@
         </ion-toolbar>
 
         <swiper :slides-per-view="2.2" :loop="false" id="swiper-decks">
-          <swiper-slide v-for="deck in course.decks" :key="deck">
+          <swiper-slide v-for="deck in course.decksInProgress" :key="deck">
 
-            <ion-card @click="$router.push('/courses/home/' + deck.id)" v-if="deck.isPlaying">
+            <ion-card :id="'present-alert' + deck.id">
               <img alt="deck logo" :src="server + '/' + deck.thumbnail" />
               <ion-card-header>
                 <!-- <ion-card-title>{{ deck.name }}</ion-card-title> -->
                 <ion-card-subtitle>{{ deck.name }}</ion-card-subtitle>
               </ion-card-header>
             </ion-card>
+            <ion-alert :trigger="'present-alert' + deck.id" class="custom-alert" header="Continuar estudos?"
+                  :buttons="alertButtons" @didDismiss="startNewDeck($event, deck.id)"></ion-alert>
           </swiper-slide>
         </swiper>
         <ion-toolbar>
@@ -38,17 +40,14 @@
         <div class="new-decks">
           <ion-grid>
             <ion-row>
-              <ion-col size="6" v-for="deck in course.decks" :key="deck">
-                <!-- <ion-card @click="$router.push('/courses/home/' + deck.id)" v-if="!deck.isPlaying" :id="'present-alert' + deck.id"> -->
-                  <ion-card v-if="!deck.isPlaying" :id="'present-alert' + deck.id">
+              <ion-col size="6" v-for="deck in course.newDecks" :key="deck">
+                <ion-card :id="'present-alert' + deck.id">
 
                   <img alt="deck logo" :src="server + '/' + deck.thumbnail" />
                   <ion-card-header>
-                    <!-- <ion-card-title>{{ deck.name }}</ion-card-title> -->
                     <ion-card-subtitle>{{ deck.name }}</ion-card-subtitle>
                   </ion-card-header>
                 </ion-card>
-                <!-- <ion-button :id="'present-alert' + deck.id">Click Me</ion-button> -->
                 <ion-alert :trigger="'present-alert' + deck.id" class="custom-alert" header="Iniciar estudos?"
                   :buttons="alertButtons" @didDismiss="startNewDeck($event, deck.id)"></ion-alert>
 
@@ -91,6 +90,8 @@ import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 
+import deckStore from '@/stores/deckStore'
+
 
 // import { Navigation } from 'swiper/modules';
 
@@ -120,12 +121,23 @@ const alertButtons = ref([
 
 onIonViewDidEnter(async () => {
   course.value = await courseService.getCourseData(route.params.id);
+  course.value.decksInProgress = course.value.decks.filter((item) => item.isPlaying == true)
+  course.value.newDecks = course.value.decks.filter((item) => item.isPlaying == false)
+  console.log(course.value)
 });
 
 const startNewDeck = async function (ev: CustomEvent, deckId: any) {
-  if(ev.detail.role == 'confirm') {
-    await deckService.playDeck(route.params.id)
-    router.push('/deck/play/' + deckId)
+  if (ev.detail.role == 'confirm') {
+    const card = await deckService.playDeck(route.params.id)
+    console.log(card);
+    if (card.length === 0) {
+      alert('Sem cards para praticar')
+    } else {
+      const currentDeck = course.value.decks.filter((item) => item.id == deckId)
+      console.log(currentDeck[0]);
+      deckStore.setCurrentDeck(currentDeck[0]);
+      router.push('/deck/play/' + deckId)
+    }
   }
 }
 

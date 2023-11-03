@@ -19,7 +19,7 @@
 
             <ion-card-content>
               <div class="quill-editor">
-                <div :ref="editor" class="user-editor" id="editor-front"></div>
+                <div :ref="editor" class="user-editor" :id="`editor-front-${randId}`"></div>
               </div>
             </ion-card-content>
           </ion-card>
@@ -30,7 +30,7 @@
 
             <ion-card-content>
               <div class="quill-editor">
-                <div :ref="editorBack" class="user-editor-back" id="editor-back"></div>
+                <div :ref="editorBack" class="user-editor-back" :id="`editor-back-${randId}`"></div>
               </div>
             </ion-card-content>
           </ion-card>
@@ -97,6 +97,8 @@ import { chevronForward } from 'ionicons/icons';
 import cardService from '@/services/cardService';
 
 const router = useIonRouter();
+import deckStore from '@/stores/deckStore'
+
 
 
 
@@ -122,6 +124,9 @@ const card = ref([])
 const newEditor = ref()
 const newEditorBack = ref()
 
+const randId = ref(Math.random())
+
+
 
 onIonViewDidEnter(async () => {
   card.value = await cardStore.getCard();
@@ -131,14 +136,16 @@ onIonViewDidEnter(async () => {
 
 const quillBackStart = function () {
 
-  newEditor.value = document.getElementById('editor-front');
+  newEditor.value = document.getElementById(`editor-front-${randId.value}`);
 
   quill = new Quill(newEditor.value, {
     theme: 'bubble',
   });
   quill.setContents(JSON.parse(card.value.front));
 
-  newEditorBack.value = document.getElementById('editor-back');
+  newEditorBack.value = document.getElementById(`editor-back-${randId.value}`);
+
+  console.log(`editor-back-${randId}`);
 
   quillBack = new Quill(newEditorBack.value, {
     theme: 'bubble',
@@ -149,7 +156,14 @@ const quillBackStart = function () {
 const sendNote = async function(note: any) {
   try {
     const response = await cardService.sendNote(card.value.deck_id, card.value.id, note)
-    router.push('/deck/play/' + card.value.deck_id)
+    console.log(response)
+    if(response.message == 'no_cards') {
+      const currentDeck = await deckStore.getCurrentDeck();
+      console.log(currentDeck)
+      router.navigate(`/courses/home/${currentDeck.id}`, 'root')
+    } else {
+      router.push('/deck/play/' + card.value.deck_id)
+    }
   }catch(error) {
     console.log(error)
   }
