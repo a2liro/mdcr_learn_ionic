@@ -29,7 +29,7 @@
         <ion-button fill="outline" @click="register" strong="true" class="btn-register">Cadastrar</ion-button>
       </div>
     </ion-content>
-    <ion-alert :is-open="isOpen" header="Atenção" sub-header="Credenciais inválidas" message="Tente novamente ou vá para o formulário de recuperação de senha!"
+    <ion-alert :is-open="isOpen" header="Atenção" :message="alertMessage"
       :buttons="alertButtons" @didDismiss="setOpen(false)"></ion-alert>
   </ion-page>
 </template>
@@ -58,6 +58,7 @@ const email = ref('');
 const password = ref('');
 const passwordConfirmation = ref('');
 const user = ref({})
+const alertMessage = ref('')
 
 const router = useIonRouter();
 
@@ -65,11 +66,32 @@ const isOpen = ref(false);
 const alertButtons = ['OK'];
 
 async function register() {
-  user.value = await userService.register(email.value, password.value);
+  if(name.value == '') {
+    alertMessage.value = 'Nome obrigatório, tente novamente!'
+    setOpen(true)
+    return;
+  }
+  if(email.value == '') {
+    alertMessage.value = 'Email obrigatório, tente novamente!'
+    setOpen(true)
+    return;
+  }
+  if(password.value == '') {
+    alertMessage.value = 'Senha obrigatório, tente novamente!'
+    setOpen(true)
+    return;
+  }
+  if(password.value !== passwordConfirmation.value) {
+    alertMessage.value = 'As senhas não conferem, tente novamente!'
+    setOpen(true)
+    return;
+  }
+  user.value = await userService.register(name.value, email.value, password.value);
   console.log(user.value)
-  if (user.value.id) {
+  if (user.value?.user?.id) {
     router.navigate('/courses');
   }else {
+    alertMessage.value = 'Este email pode já estar sendo usado, tente fazer login antes de tentar novamente!'
     setOpen(true)
   }
 }

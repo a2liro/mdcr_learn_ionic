@@ -52,8 +52,8 @@ import {
 import userService from '@/services/userService';
 import { ref } from 'vue';
 
-const email = ref('');
-const password = ref('');
+const email = ref('andreliro1945@gmail.com');
+const password = ref('12345678');
 const user = ref({})
 
 const router = useIonRouter();
@@ -64,7 +64,7 @@ const alertButtons = ['OK'];
 async function login() {
   user.value = await userService.login(email.value, password.value);
   console.log(user.value)
-  if (user.value.id) {
+  if (user.value?.user?.id) {
     router.navigate('/courses');
   }else {
     setOpen(true)

@@ -54,7 +54,8 @@ import {
   onIonViewDidEnter,
   IonCol,
   IonGrid,
-  IonRow
+  IonRow,
+  loadingController
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import courseService from '@/services/courseService';
@@ -64,8 +65,21 @@ import server from '@/config/server';
 const courses = ref([])
 
 onIonViewDidEnter(async () => {
+  const loading = await showLoading();
   courses.value = await courseService.getCourses();
-});
+  loading.dismiss()
+})
+
+const showLoading = async function () {
+  const loading = await loadingController.create({
+    message: 'Loading...',
+    mode: 'ios',
+    translucent: true,
+  });
+
+  loading.present();
+  return loading
+}
 
 </script>
 
@@ -98,4 +112,5 @@ onIonViewDidEnter(async () => {
 ion-card {
   cursor: pointer;
 }
+
 </style>
