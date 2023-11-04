@@ -3,9 +3,9 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button defaultHref="/home" text="Voltar"></ion-back-button>
+          <ion-back-button defaultHref="/login" text="Voltar"></ion-back-button>
         </ion-buttons>
-        <ion-title>Login</ion-title>
+        <ion-title>Recuperar senha</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -17,15 +17,7 @@
         <ion-item>
           <ion-input label="Email" type="email" placeholder="email@exemplo.com" v-model="email" label-placement="floating"></ion-input>
         </ion-item>
-        <ion-item>
-          <ion-input label="Senha" type="password" v-model="password" label-placement="floating"></ion-input>
-        </ion-item>
-        <ion-button fill="outline" @click="login" strong="true" class="btn-login">Login</ion-button>
-        <h3>Ou</h3>
-        <div class="register-actions">
-          <div><a href="/recovery-password">Recuperar senha!</a></div>
-          <div><a href="/register">Registre-se!</a></div>
-        </div>
+        <ion-button fill="outline" @click="login" strong="true" class="btn-login">Enviar</ion-button>
       </div>
     </ion-content>
     <ion-alert :is-open="isOpen" header="Atenção" sub-header="Credenciais inválidas" message="Tente novamente ou vá para o formulário de recuperação de senha!"

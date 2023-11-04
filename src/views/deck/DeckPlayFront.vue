@@ -180,7 +180,6 @@ onIonViewDidEnter(async () => {
 });
 
 const startRecognition = async function () {
-  alert(hasPermissions.speechRecognition);
   if (hasPermissions.speechRecognition !== 'granted') {
     SpeechRecognition.requestPermissions();
   }

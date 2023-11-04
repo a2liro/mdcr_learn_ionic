@@ -85,7 +85,6 @@ import {
   IonCardTitle,
   onIonViewDidEnter,
   IonFooter,
-  IonIcon,
   IonRow,
   IonCol,
   IonGrid,
@@ -93,25 +92,28 @@ import {
 } from '@ionic/vue';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
-import { chevronForward } from 'ionicons/icons';
 import cardService from '@/services/cardService';
 
-const router = useIonRouter();
+// const router = useIonRouter();
 import deckStore from '@/stores/deckStore'
 
 
 
 
+
+
 import { ref, watch } from 'vue';
-import server from '@/config/server';
-import { useRoute } from 'vue-router';
 import cardStore from '@/stores/cardStore';
 import 'quill/dist/quill.core.css'
 import 'quill/dist/quill.bubble.css'
 import 'quill/dist/quill.snow.css'
 
+
 // import Quill from 'quill/core';
 import Quill from 'quill';
+import { useRouter } from 'vue-router';
+const router = useRouter()
+
 
 const editor = ref();
 const editorBack = ref();
@@ -160,7 +162,9 @@ const sendNote = async function(note: any) {
     if(response.message == 'no_cards') {
       const currentDeck = await deckStore.getCurrentDeck();
       console.log(currentDeck)
-      router.navigate(`/courses/home/${currentDeck.id}`, 'root')
+      router.go(-4)
+      router.replace(`/courses/home/${currentDeck.id}`)
+      // router.push(`/courses/home/${currentDeck.id}`)
     } else {
       router.push('/deck/play/' + card.value.deck_id)
     }

@@ -15,7 +15,7 @@ const userService = {
         };
         const response = await axios.post(server + '/api/login', data, config);
         await userStore.setUser(response.data.user);
-        return response;
+        return response.data;
     },
 }
 

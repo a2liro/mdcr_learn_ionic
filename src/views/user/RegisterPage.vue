@@ -5,7 +5,7 @@
         <ion-buttons slot="start">
           <ion-back-button defaultHref="/home" text="Voltar"></ion-back-button>
         </ion-buttons>
-        <ion-title>Login</ion-title>
+        <ion-title>Cadastro</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -15,17 +15,18 @@
           <ion-img src="/assets/images/logo_001_512x512.png" class="logo"></ion-img>
         </div>
         <ion-item>
+          <ion-input label="Nome" type="text" v-model="name" label-placement="floating"></ion-input>
+        </ion-item>
+        <ion-item>
           <ion-input label="Email" type="email" placeholder="email@exemplo.com" v-model="email" label-placement="floating"></ion-input>
         </ion-item>
         <ion-item>
-          <ion-input label="Senha" type="password" v-model="password" label-placement="floating"></ion-input>
+          <ion-input label="Senha" type="text" v-model="password" label-placement="floating"></ion-input>
         </ion-item>
-        <ion-button fill="outline" @click="login" strong="true" class="btn-login">Login</ion-button>
-        <h3>Ou</h3>
-        <div class="register-actions">
-          <div><a href="/recovery-password">Recuperar senha!</a></div>
-          <div><a href="/register">Registre-se!</a></div>
-        </div>
+        <ion-item>
+          <ion-input label="Confirmar Senha" type="text" v-model="passwordConfirmation" label-placement="floating"></ion-input>
+        </ion-item>
+        <ion-button fill="outline" @click="register" strong="true" class="btn-register">Cadastrar</ion-button>
       </div>
     </ion-content>
     <ion-alert :is-open="isOpen" header="Atenção" sub-header="Credenciais inválidas" message="Tente novamente ou vá para o formulário de recuperação de senha!"
@@ -52,8 +53,10 @@ import {
 import userService from '@/services/userService';
 import { ref } from 'vue';
 
+const name = ref('');
 const email = ref('');
 const password = ref('');
+const passwordConfirmation = ref('');
 const user = ref({})
 
 const router = useIonRouter();
@@ -61,8 +64,8 @@ const router = useIonRouter();
 const isOpen = ref(false);
 const alertButtons = ['OK'];
 
-async function login() {
-  user.value = await userService.login(email.value, password.value);
+async function register() {
+  user.value = await userService.register(email.value, password.value);
   console.log(user.value)
   if (user.value.id) {
     router.navigate('/courses');
@@ -129,7 +132,7 @@ ion-button {
   --padding-bottom: 10px;
 }
 
-.btn-login {
+.btn-register {
   margin: 2em;
   width: 12em;
 }

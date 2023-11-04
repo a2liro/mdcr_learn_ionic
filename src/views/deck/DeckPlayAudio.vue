@@ -10,12 +10,12 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      <div id="container">
-        <audio controls autoplay v-if="card?.audiofile">
+      
+      <div id="container" >
+        <audio controls autoplay v-if="card?.audiofile" :id="'audio' + Math.random()">
           <source :src="server + '/' + card?.audiofile" type="audio/mpeg">
           Your browser does not support the audio element.
         </audio>
-
       </div>
     </ion-content>
     <ion-footer>
@@ -81,8 +81,10 @@ const card = ref([])
 const audioAsset = ref({});
 
 onIonViewDidEnter(async () => {
+card.value = [];
   card.value = await cardStore.getCard();
 });
+
 
 </script>
 

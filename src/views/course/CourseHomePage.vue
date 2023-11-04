@@ -11,7 +11,7 @@
 
     <ion-content>
       <div id="container">
-        <swiper :slides-per-view="3.5" :loop="false" id="swiper-categories">
+        <swiper :slides-per-view="2.6" :loop="false" id="swiper-categories">
           <swiper-slide v-for="category in course.categories" :key="category">
             <span class="category-name">{{ category.name }}</span>
           </swiper-slide>
@@ -145,7 +145,7 @@ const startNewDeck = async function (ev: CustomEvent, deckId: any) {
 
 <style scoped>
 #swiper-categories {
-  background-color: rgb(86, 120, 91);
+  background-color: #518561;
   height: 4em;
   padding-left: 1em;
   padding-right: 1em;
