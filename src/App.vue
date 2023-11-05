@@ -62,6 +62,7 @@ import {
   trashSharp,
   warningOutline,
   warningSharp,
+  logOutOutline
 } from 'ionicons/icons';
 
 const selectedIndex = ref(0);
@@ -101,6 +102,12 @@ const appPages = [
     url: '/folder/Spam',
     iosIcon: warningOutline,
     mdIcon: warningSharp,
+  },
+  {
+    title: 'Logout',
+    url: '/folder/Spam',
+    iosIcon: logOutOutline,
+    mdIcon: logOutOutline,
   },
 ];
 const labels = ['Family', 'Friends', 'Notes', 'Work', 'Travel', 'Reminders'];
