@@ -96,7 +96,7 @@ import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
 import cardService from '@/services/cardService';
 
-// const router = useIonRouter();
+const router = useIonRouter();
 import deckStore from '@/stores/deckStore'
 
 
@@ -114,7 +114,7 @@ import 'quill/dist/quill.snow.css'
 // import Quill from 'quill/core';
 import Quill from 'quill';
 import { useRouter } from 'vue-router';
-const router = useRouter()
+// const router = useRouter()
 
 
 const editor = ref();
@@ -169,11 +169,10 @@ const sendNote = async function(note: any) {
     if(response.message == 'no_cards') {
       const currentDeck = await deckStore.getCurrentDeck();
       console.log(currentDeck)
-      router.go(-4)
-      router.replace(`/courses/home/${currentDeck.id}`)
+      router.navigate(`/courses/home/${currentDeck.id}`, 'root')
       // router.push(`/courses/home/${currentDeck.id}`)
     } else {
-      router.push('/deck/play/' + card.value.deck_id)
+      router.navigate('/deck/play/' + card.value.deck_id, 'root')
     }
   }catch(error) {
     console.log(error)
