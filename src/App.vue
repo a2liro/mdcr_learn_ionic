@@ -105,7 +105,7 @@ const appPages = [
   },
   {
     title: 'Logout',
-    url: '/folder/Spam',
+    url: '/logout',
     iosIcon: logOutOutline,
     mdIcon: logOutOutline,
   },
