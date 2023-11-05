@@ -3,9 +3,10 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
           <ion-back-button defaultHref="/home" text="Voltar"></ion-back-button>
         </ion-buttons>
-        <ion-title size="large">Cursos</ion-title>
+        <ion-title size="large">Curso - {{ course?.course?.name }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -84,7 +85,8 @@ import {
   useIonRouter,
   IonAlert,
   onIonViewWillEnter,
-  loadingController
+  loadingController,
+  IonMenuButton
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import courseService from '@/services/courseService';
@@ -138,7 +140,7 @@ const startNewDeck = async function (ev: CustomEvent, deckId: any) {
   if (ev.detail.role == 'confirm') {
     loading.value = await showLoading()
     loading.value?.present();
-    const card = await deckService.playDeck(route.params.id)
+    const card = await deckService.playDeck(deckId)
     console.log(card);
     if (card.length === 0) {
       loading.value?.dismiss();

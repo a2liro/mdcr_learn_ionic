@@ -3,7 +3,7 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button text="Voltar"></ion-back-button>
+          <ion-back-button text="Voltar" :defaultHref="`/courses/home/${currentDeck.course_id}`"></ion-back-button>
         </ion-buttons>
         <ion-title size="large">Playing audio</ion-title>
       </ion-toolbar>
@@ -76,6 +76,7 @@ import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 import cardStore from '@/stores/cardStore';
+import deckStore from '@/stores/deckStore';
 
 
 
@@ -87,6 +88,7 @@ import server from '@/config/server';
 import { useRoute } from 'vue-router';
 const route = useRoute();
 const card = ref([])
+const currentDeck = ref([])
 
 const audioAsset = ref({});
 const loading = ref<HTMLIonLoadingElement>();
@@ -99,6 +101,7 @@ onIonViewWillEnter(async () => {
 onIonViewDidEnter(async () => {
   card.value = [];
   card.value = await cardStore.getCard();
+  currentDeck.value = await deckStore.getCurrentDeck();
   loading.value?.dismiss();
 });
 
