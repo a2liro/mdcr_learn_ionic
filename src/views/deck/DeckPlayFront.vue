@@ -42,11 +42,18 @@
           <ion-card id="card-practice">
             <ion-card-header>
               <ion-card-title>Praticar</ion-card-title>
-              <!-- <ion-card-subtitle>Frente:</ion-card-subtitle> -->
+              <ion-card-subtitle>Resultado:
+
+                <div class="words" style="display:none;">
+                <p id="p"></p>
+              </div>
+              <div id="result"></div>
+              </ion-card-subtitle>
             </ion-card-header>
 
             <ion-card-content>
-              Resultado: {{ speechResult }}
+              <div class="heaer-error">{{ noHear }}</div>
+              <!-- Resultado: {{ speechResult }} -->
               <ion-button expand="block" @click="startRecognition" v-if="isListening" color="danger">
                 Parar
                 <ion-icon slot="end" :icon="square"></ion-icon>
@@ -137,6 +144,8 @@ const speechResult = ref('')
 
 const randId = ref(Math.random())
 
+const noHear = ref<String>('')
+
 
 // Quill.register({
 //   'modules/toolbar': Toolbar,
@@ -196,7 +205,6 @@ onIonViewDidEnter(async () => {
 
     }
   }
-  
 });
 
 const startRecognition = async function () {
@@ -213,8 +221,9 @@ const startRecognition = async function () {
   }).then((value) => {
     isListening.value = false;
     speechResult.value = value.matches[0]
+    changed()
   }).catch((error) => {
-    alert('Não foi possível ouvir sua voz, tente novamente')
+    noHear.value = 'Não foi possível ouvir sua voz, tente novamente!';
     isListening.value = false;
   });
 }
@@ -228,6 +237,68 @@ const showLoading = async function () {
 
   loading.present();
   return loading
+}
+
+
+
+
+
+
+import * as differ from 'diff'
+
+function changed() {
+  var b = document.getElementById('p');
+var result = document.getElementById('result');
+
+console.log(result);
+
+
+  let cardFront = card.value.front.split('/')[0];
+
+  cardFront = cardFront
+  .replaceAll('"ops":', '')
+  .replaceAll('"insert":', '')
+  .replaceAll('"attributes":', '')
+  .replaceAll('"size":', '')
+  .replaceAll('"large"', '')
+  .replaceAll('"normal"', '')
+  .replaceAll('"color":', '')
+  .replaceAll('"background":', '')
+  .replaceAll("\\n", '')
+  .replaceAll("],", '')
+  .replaceAll("},", '')
+  .replaceAll("{,", '')
+  .replace(/",/g, '')
+  .replaceAll(/#[0-9A-Fa-f]{6}/g, '')
+  .replace(/[\[\]{}"]/g, '')
+
+
+	var diffLocal = differ['diffChars'](cardFront.toLowerCase(), speechResult.value.toLowerCase()) //JsDiff['diffChars'](aValue, speechResult.value.textContent.toLowerCase());
+	var fragment = document.createDocumentFragment();
+	for (var i=0; i < diffLocal.length; i++) {
+
+		if (diffLocal[i].added && diffLocal[i + 1] && diffLocal[i + 1].removed) {
+			var swap = diffLocal[i];
+			diffLocal[i] = diffLocal[i + 1];
+			diffLocal[i + 1] = swap;
+		}
+
+		var node;
+		if (diffLocal[i].removed) {
+			node = document.createElement('del');
+			node.appendChild(document.createTextNode(diffLocal[i].value));
+		} else if (diffLocal[i].added) {
+			node = document.createElement('ins');
+			node.appendChild(document.createTextNode(diffLocal[i].value));
+		} else {
+			node = document.createTextNode(diffLocal[i].value);
+		}
+		fragment.appendChild(node);
+	}
+
+	result.textContent = '';
+	result.appendChild(fragment);
+  console.log(fragment)
 }
 
 </script>
@@ -281,5 +352,27 @@ button.alert-button.alert-button-confirm {
 
 #card-practice {
   margin-top: 2.5em;
+}
+
+del {
+  text-decoration: none;
+  color: #5c5b5b;
+  background: #fadad7;
+}
+
+ins {
+  background: #ee881b;
+  color: #406619;
+  text-decoration: none;
+}
+
+#result {
+  margin-top: 0.6em;
+  font-size: 1.3em;
+}
+
+.heaer-error {
+  color: #c33502;
+  font-size: large;
 }
 </style>
