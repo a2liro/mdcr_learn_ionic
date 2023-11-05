@@ -55,7 +55,8 @@ import {
   IonCol,
   IonGrid,
   IonRow,
-  loadingController
+  loadingController,
+onIonViewWillEnter
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import courseService from '@/services/courseService';
@@ -64,11 +65,17 @@ import { ref } from 'vue';
 import server from '@/config/server';
 const courses = ref([])
 
-onIonViewDidEnter(async () => {
-  const loading = await showLoading();
-  courses.value = await courseService.getCourses();
-  loading.dismiss()
+const loading = ref<HTMLIonLoadingElement>();
+
+onIonViewWillEnter(async () => {
+  loading.value = await showLoading();
 })
+
+onIonViewDidEnter(async () => {
+  courses.value = await courseService.getCourses();
+  loading.value?.dismiss();
+})
+
 
 const showLoading = async function () {
   const loading = await loadingController.create({

@@ -15,7 +15,8 @@
           <ion-img src="/assets/images/logo_001_512x512.png" class="logo"></ion-img>
         </div>
         <ion-item>
-          <ion-input label="Email" type="email" placeholder="email@exemplo.com" v-model="email" label-placement="floating"></ion-input>
+          <ion-input label="Email" type="email" placeholder="email@exemplo.com" v-model="email"
+            label-placement="floating"></ion-input>
         </ion-item>
         <ion-item>
           <ion-input label="Senha" type="password" v-model="password" label-placement="floating"></ion-input>
@@ -28,8 +29,9 @@
         </div>
       </div>
     </ion-content>
-    <ion-alert :is-open="isOpen" header="Atenção" sub-header="Credenciais inválidas" message="Tente novamente ou vá para o formulário de recuperação de senha!"
-      :buttons="alertButtons" @didDismiss="setOpen(false)"></ion-alert>
+    <ion-alert :is-open="isOpen" header="Atenção" sub-header="Credenciais inválidas"
+      message="Tente novamente ou vá para o formulário de recuperação de senha!" :buttons="alertButtons"
+      @didDismiss="setOpen(false)"></ion-alert>
   </ion-page>
 </template>
 
@@ -47,10 +49,13 @@ import {
   IonButton,
   useIonRouter,
   IonAlert,
-  IonImg
+  IonImg,
+  loadingController,
+  onIonViewWillEnter,
+onIonViewDidEnter
 } from '@ionic/vue';
 import userService from '@/services/userService';
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 
 const email = ref('andreliro1945@gmail.com');
 const password = ref('12345678');
@@ -60,22 +65,46 @@ const router = useIonRouter();
 
 const isOpen = ref(false);
 const alertButtons = ['OK'];
+const loading = ref<HTMLIonLoadingElement>();
+
+
+onIonViewWillEnter(async () => {
+  loading.value = await showLoading(150);
+  console.log('will')
+})
+
+onIonViewDidEnter(async () => {
+  await loading.value?.dismiss()
+  console.log('did')
+})
 
 async function login() {
+  loading.value = await showLoading(0)
   user.value = await userService.login(email.value, password.value);
   console.log(user.value)
   if (user.value?.user?.id) {
+    loading.value.dismiss();
     router.navigate('/courses');
-  }else {
+  } else {
     setOpen(true)
   }
 }
 
-
-
 const setOpen = (state: boolean) => {
   isOpen.value = state;
 };
+
+const showLoading = async function (duration) {
+  const loading = await loadingController.create({
+    message: 'Loading...',
+    mode: 'ios',
+    translucent: true,
+    duration: duration,
+  });
+
+  loading.present();
+  return loading
+}
 </script>
 
 <style scoped>

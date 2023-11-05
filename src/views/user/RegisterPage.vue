@@ -48,7 +48,9 @@ import {
   IonButton,
   useIonRouter,
   IonAlert,
-  IonImg
+  IonImg,
+loadingController,
+onIonViewWillEnter
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import { ref } from 'vue';
@@ -64,6 +66,12 @@ const router = useIonRouter();
 
 const isOpen = ref(false);
 const alertButtons = ['OK'];
+const loading = ref<HTMLIonLoadingElement>();
+
+
+onIonViewWillEnter(async () => {
+  loading.value = await showLoading(150);
+})
 
 async function register() {
   if(name.value == '') {
@@ -86,7 +94,9 @@ async function register() {
     setOpen(true)
     return;
   }
+  loading.value = await showLoading(0)
   user.value = await userService.register(name.value, email.value, password.value);
+  loading.value.dismiss();
   console.log(user.value)
   if (user.value?.user?.id) {
     router.navigate('/courses');
@@ -101,6 +111,18 @@ async function register() {
 const setOpen = (state: boolean) => {
   isOpen.value = state;
 };
+
+const showLoading = async function (duration: number) {
+  const loading = await loadingController.create({
+    message: 'Loading...',
+    mode: 'ios',
+    translucent: true,
+    duration: duration
+  });
+
+  loading.present();
+  return loading
+}
 </script>
 
 <style scoped>
@@ -148,7 +170,7 @@ ion-button {
 
   --box-shadow: 0 2px 6px 0 rgb(0, 0, 0, 0.25);
 
-  --ripple-color: deeppink;
+  --ripple-color: #56933a;
 
   --padding-top: 10px;
   --padding-bottom: 10px;

@@ -89,6 +89,8 @@ import {
   IonCol,
   IonGrid,
   useIonRouter,
+onIonViewWillEnter,
+loadingController,
 } from '@ionic/vue';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
@@ -127,14 +129,19 @@ const newEditor = ref()
 const newEditorBack = ref()
 
 const randId = ref(Math.random())
+const loading = ref<HTMLIonLoadingElement>();
 
 
+onIonViewWillEnter(async () => {
+  loading.value = await showLoading();
+})
 
 onIonViewDidEnter(async () => {
   card.value = await cardStore.getCard();
   quillBackStart()
-});
 
+  loading.value?.dismiss();
+});
 
 const quillBackStart = function () {
 
@@ -171,6 +178,17 @@ const sendNote = async function(note: any) {
   }catch(error) {
     console.log(error)
   }
+}
+
+const showLoading = async function () {
+  const loading = await loadingController.create({
+    message: 'Loading...',
+    mode: 'ios',
+    translucent: true,
+  });
+
+  loading.present();
+  return loading
 }
 </script>
 
