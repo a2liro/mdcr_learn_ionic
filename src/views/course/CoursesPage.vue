@@ -3,7 +3,8 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button defaultHref="/home" text="Voltar"></ion-back-button>
+          <ion-menu-button></ion-menu-button>
+          <!-- <ion-back-button defaultHref="/home" text="Voltar"></ion-back-button> -->
         </ion-buttons>
         <ion-title>Cursos</ion-title>
       </ion-toolbar>
@@ -42,19 +43,16 @@ import {
   IonPage,
   IonTitle,
   IonToolbar,
-  IonBackButton,
-  IonItem,
-  IonInput,
-  IonButton,
   IonCard,
-  IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
-  IonCardTitle,
   onIonViewDidEnter,
   IonCol,
   IonGrid,
-  IonRow
+  IonRow,
+  loadingController,
+  onIonViewWillEnter,
+  IonMenuButton
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import courseService from '@/services/courseService';
@@ -63,9 +61,28 @@ import { ref } from 'vue';
 import server from '@/config/server';
 const courses = ref([])
 
+const loading = ref<HTMLIonLoadingElement>();
+
+onIonViewWillEnter(async () => {
+  loading.value = await showLoading();
+})
+
 onIonViewDidEnter(async () => {
   courses.value = await courseService.getCourses();
-});
+  loading.value?.dismiss();
+})
+
+
+const showLoading = async function () {
+  const loading = await loadingController.create({
+    message: 'Loading...',
+    mode: 'ios',
+    translucent: true,
+  });
+
+  loading.present();
+  return loading
+}
 
 </script>
 

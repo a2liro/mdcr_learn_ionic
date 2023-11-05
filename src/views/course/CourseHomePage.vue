@@ -3,9 +3,10 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
+          <ion-menu-button></ion-menu-button>
           <ion-back-button defaultHref="/home" text="Voltar"></ion-back-button>
         </ion-buttons>
-        <ion-title size="large">Cursos</ion-title>
+        <ion-title size="large">Curso - {{ course?.course?.name }}</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -31,7 +32,7 @@
               </ion-card-header>
             </ion-card>
             <ion-alert :trigger="'present-alert' + deck.id" class="custom-alert" header="Continuar estudos?"
-                  :buttons="alertButtons" @didDismiss="startNewDeck($event, deck.id)"></ion-alert>
+              :buttons="alertButtons" @didDismiss="startNewDeck($event, deck.id)"></ion-alert>
           </swiper-slide>
         </swiper>
         <ion-toolbar>
@@ -82,7 +83,10 @@ import {
   IonGrid,
   IonRow,
   useIonRouter,
-  IonAlert
+  IonAlert,
+  onIonViewWillEnter,
+  loadingController,
+  IonMenuButton
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import courseService from '@/services/courseService';
@@ -105,6 +109,7 @@ const password = ref('12345678');
 const course = ref([])
 const route = useRoute();
 const router = useIonRouter();
+const loading = ref<HTMLIonLoadingElement>();
 
 const alertButtons = ref([
   {
@@ -119,26 +124,45 @@ const alertButtons = ref([
   },
 ])
 
+onIonViewWillEnter(async () => {
+  loading.value = await showLoading();
+})
+
 onIonViewDidEnter(async () => {
   course.value = await courseService.getCourseData(route.params.id);
   course.value.decksInProgress = course.value.decks.filter((item) => item.isPlaying == true)
   course.value.newDecks = course.value.decks.filter((item) => item.isPlaying == false)
   console.log(course.value)
+  loading.value?.dismiss();
 });
 
 const startNewDeck = async function (ev: CustomEvent, deckId: any) {
   if (ev.detail.role == 'confirm') {
-    const card = await deckService.playDeck(route.params.id)
+    loading.value = await showLoading()
+    loading.value?.present();
+    const card = await deckService.playDeck(deckId)
     console.log(card);
     if (card.length === 0) {
+      loading.value?.dismiss();
       alert('Sem cards para praticar')
     } else {
       const currentDeck = course.value.decks.filter((item) => item.id == deckId)
       console.log(currentDeck[0]);
       deckStore.setCurrentDeck(currentDeck[0]);
+      loading.value?.dismiss();
       router.push('/deck/play/' + deckId)
     }
   }
+}
+const showLoading = async function () {
+  const loading = await loadingController.create({
+    message: 'Loading...',
+    mode: 'ios',
+    translucent: true,
+  });
+
+  loading.present();
+  return loading
 }
 
 </script>

@@ -11,10 +11,21 @@
 
     <ion-content>
       <div id="container">
-        <audio controls autoplay v-if="card?.audiofile">
-          <source :src="server + '/' + card?.audiofile" type="audio/mpeg">
-          Your browser does not support the audio element.
-        </audio>
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Audio:</ion-card-title>
+            <!-- <ion-card-subtitle>Frente:</ion-card-subtitle> -->
+          </ion-card-header>
+
+          <ion-card-content>
+            <audio controls autoplay v-if="card?.audiofile">
+              <source :src="server + '/' + card?.audiofile" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </ion-card-content>
+        </ion-card>
+
+
         <div>
           <ion-card>
             <ion-card-header>
@@ -92,7 +103,8 @@ import {
   useIonRouter,
   IonAlert,
   IonFooter,
-  IonIcon
+  IonIcon,
+loadingController
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import courseService from '@/services/courseService';
@@ -147,6 +159,13 @@ const isListening = ref(false);
 
 let hasPermissions: any;
 
+const loading = ref<HTMLIonLoadingElement>();
+
+
+onIonViewWillEnter(async () => {
+  loading.value = await showLoading();
+})
+
 onIonViewDidEnter(async () => {
 
   card.value = await cardStore.getCard();
@@ -160,7 +179,7 @@ onIonViewDidEnter(async () => {
   });
   quill.setContents(JSON.parse(card.value.front));
   // quill.blur();
-
+  loading.value?.dismiss();
   if (isPlatform('android') || isPlatform('ios')) {
     const availableRec = await SpeechRecognition.available()
     if (availableRec.available === true) {
@@ -177,6 +196,7 @@ onIonViewDidEnter(async () => {
 
     }
   }
+  
 });
 
 const startRecognition = async function () {
@@ -197,6 +217,17 @@ const startRecognition = async function () {
     alert('Não foi possível ouvir sua voz, tente novamente')
     isListening.value = false;
   });
+}
+
+const showLoading = async function () {
+  const loading = await loadingController.create({
+    message: 'Loading...',
+    mode: 'ios',
+    translucent: true,
+  });
+
+  loading.present();
+  return loading
 }
 
 </script>

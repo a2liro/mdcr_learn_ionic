@@ -29,7 +29,7 @@
         <ion-button fill="outline" @click="register" strong="true" class="btn-register">Cadastrar</ion-button>
       </div>
     </ion-content>
-    <ion-alert :is-open="isOpen" header="Atenção" sub-header="Credenciais inválidas" message="Tente novamente ou vá para o formulário de recuperação de senha!"
+    <ion-alert :is-open="isOpen" header="Atenção" :message="alertMessage"
       :buttons="alertButtons" @didDismiss="setOpen(false)"></ion-alert>
   </ion-page>
 </template>
@@ -48,7 +48,9 @@ import {
   IonButton,
   useIonRouter,
   IonAlert,
-  IonImg
+  IonImg,
+loadingController,
+onIonViewWillEnter
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import { ref } from 'vue';
@@ -58,18 +60,48 @@ const email = ref('');
 const password = ref('');
 const passwordConfirmation = ref('');
 const user = ref({})
+const alertMessage = ref('')
 
 const router = useIonRouter();
 
 const isOpen = ref(false);
 const alertButtons = ['OK'];
+const loading = ref<HTMLIonLoadingElement>();
+
+
+onIonViewWillEnter(async () => {
+  loading.value = await showLoading(150);
+})
 
 async function register() {
-  user.value = await userService.register(email.value, password.value);
+  if(name.value == '') {
+    alertMessage.value = 'Nome obrigatório, tente novamente!'
+    setOpen(true)
+    return;
+  }
+  if(email.value == '') {
+    alertMessage.value = 'Email obrigatório, tente novamente!'
+    setOpen(true)
+    return;
+  }
+  if(password.value == '') {
+    alertMessage.value = 'Senha obrigatório, tente novamente!'
+    setOpen(true)
+    return;
+  }
+  if(password.value !== passwordConfirmation.value) {
+    alertMessage.value = 'As senhas não conferem, tente novamente!'
+    setOpen(true)
+    return;
+  }
+  loading.value = await showLoading(0)
+  user.value = await userService.register(name.value, email.value, password.value);
+  loading.value.dismiss();
   console.log(user.value)
-  if (user.value.id) {
+  if (user.value?.user?.id) {
     router.navigate('/courses');
   }else {
+    alertMessage.value = 'Este email pode já estar sendo usado, tente fazer login antes de tentar novamente!'
     setOpen(true)
   }
 }
@@ -79,6 +111,18 @@ async function register() {
 const setOpen = (state: boolean) => {
   isOpen.value = state;
 };
+
+const showLoading = async function (duration: number) {
+  const loading = await loadingController.create({
+    message: 'Loading...',
+    mode: 'ios',
+    translucent: true,
+    duration: duration
+  });
+
+  loading.present();
+  return loading
+}
 </script>
 
 <style scoped>
@@ -126,7 +170,7 @@ ion-button {
 
   --box-shadow: 0 2px 6px 0 rgb(0, 0, 0, 0.25);
 
-  --ripple-color: deeppink;
+  --ripple-color: #56933a;
 
   --padding-top: 10px;
   --padding-bottom: 10px;
