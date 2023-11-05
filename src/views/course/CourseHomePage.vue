@@ -31,7 +31,7 @@
               </ion-card-header>
             </ion-card>
             <ion-alert :trigger="'present-alert' + deck.id" class="custom-alert" header="Continuar estudos?"
-                  :buttons="alertButtons" @didDismiss="startNewDeck($event, deck.id)"></ion-alert>
+              :buttons="alertButtons" @didDismiss="startNewDeck($event, deck.id)"></ion-alert>
           </swiper-slide>
         </swiper>
         <ion-toolbar>
@@ -82,7 +82,9 @@ import {
   IonGrid,
   IonRow,
   useIonRouter,
-  IonAlert
+  IonAlert,
+  onIonViewWillEnter,
+  loadingController
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import courseService from '@/services/courseService';
@@ -105,6 +107,7 @@ const password = ref('12345678');
 const course = ref([])
 const route = useRoute();
 const router = useIonRouter();
+const loading = ref<HTMLIonLoadingElement>();
 
 const alertButtons = ref([
   {
@@ -119,26 +122,45 @@ const alertButtons = ref([
   },
 ])
 
+onIonViewWillEnter(async () => {
+  loading.value = await showLoading();
+})
+
 onIonViewDidEnter(async () => {
   course.value = await courseService.getCourseData(route.params.id);
   course.value.decksInProgress = course.value.decks.filter((item) => item.isPlaying == true)
   course.value.newDecks = course.value.decks.filter((item) => item.isPlaying == false)
   console.log(course.value)
+  loading.value?.dismiss();
 });
 
 const startNewDeck = async function (ev: CustomEvent, deckId: any) {
   if (ev.detail.role == 'confirm') {
+    loading.value = await showLoading()
+    loading.value?.present();
     const card = await deckService.playDeck(route.params.id)
     console.log(card);
     if (card.length === 0) {
+      loading.value?.dismiss();
       alert('Sem cards para praticar')
     } else {
       const currentDeck = course.value.decks.filter((item) => item.id == deckId)
       console.log(currentDeck[0]);
       deckStore.setCurrentDeck(currentDeck[0]);
+      loading.value?.dismiss();
       router.push('/deck/play/' + deckId)
     }
   }
+}
+const showLoading = async function () {
+  const loading = await loadingController.create({
+    message: 'Loading...',
+    mode: 'ios',
+    translucent: true,
+  });
+
+  loading.present();
+  return loading
 }
 
 </script>

@@ -10,12 +10,21 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-      
-      <div id="container" >
-        <audio controls autoplay v-if="card?.audiofile" :id="'audio' + Math.random()">
-          <source :src="server + '/' + card?.audiofile" type="audio/mpeg">
-          Your browser does not support the audio element.
-        </audio>
+
+      <div id="container">
+        <ion-card>
+          <ion-card-header>
+            <ion-card-title>Audio:</ion-card-title>
+          </ion-card-header>
+
+          <ion-card-content>
+            <audio controls autoplay v-if="card?.audiofile" :id="'audio' + Math.random()">
+              <source :src="server + '/' + card?.audiofile" type="audio/mpeg">
+              Your browser does not support the audio element.
+            </audio>
+          </ion-card-content>
+        </ion-card>
+
       </div>
     </ion-content>
     <ion-footer>
@@ -56,7 +65,8 @@ import {
   useIonRouter,
   IonAlert,
   IonFooter,
-  IonIcon
+  IonIcon,
+  loadingController
 } from '@ionic/vue';
 import { chevronForward } from 'ionicons/icons';
 
@@ -79,16 +89,48 @@ const route = useRoute();
 const card = ref([])
 
 const audioAsset = ref({});
+const loading = ref<HTMLIonLoadingElement>();
+
+
+onIonViewWillEnter(async () => {
+  loading.value = await showLoading();
+})
 
 onIonViewDidEnter(async () => {
-card.value = [];
+  card.value = [];
   card.value = await cardStore.getCard();
+  loading.value?.dismiss();
 });
 
+const showLoading = async function () {
+  const loading = await loadingController.create({
+    message: 'Loading...',
+    mode: 'ios',
+    translucent: true,
+  });
+
+  loading.present();
+  return loading
+}
 
 </script>
 
 <style scoped>
+#container {
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+
+  /* display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  padding-top: 3em; */
+}
+
 #swiper-categories {
   background-color: rgb(86, 120, 91);
   height: 4em;
