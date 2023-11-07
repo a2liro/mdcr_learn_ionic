@@ -1,7 +1,7 @@
 {
-  "name": "mdcrlearn",
+  "name": "MDCR Learn",
   "private": true,
-  "version": "0.0.1",
+  "version": "1.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
@@ -31,6 +31,7 @@
     "vue-router": "^4.1.6"
   },
   "devDependencies": {
+    "@capacitor/assets": "^3.0.1",
     "@capacitor/cli": "5.5.0",
     "@types/diff": "^5.0.7",
     "@vitejs/plugin-legacy": "^4.0.2",
@@ -46,5 +47,5 @@
     "vitest": "^0.32.2",
     "vue-tsc": "^1.0.24"
   },
-  "description": "An Ionic project"
+  "description": "Learn english easily with flashcards"
 }

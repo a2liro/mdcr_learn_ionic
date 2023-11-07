@@ -1,4 +1,4 @@
-package ionic.mdcrlearn;
+package br.com.mdcr.mdcr_learn;
 
 import com.getcapacitor.BridgeActivity;
 

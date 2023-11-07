@@ -1,7 +1,7 @@
 <?xml version='1.0' encoding='utf-8'?>
 <resources>
-    <string name="app_name">mdcrlearn</string>
-    <string name="title_activity_main">mdcrlearn</string>
-    <string name="package_name">ionic.mdcrlearn</string>
-    <string name="custom_url_scheme">ionic.mdcrlearn</string>
+    <string name="app_name">MDCR Learn</string>
+    <string name="title_activity_main">MDCR Learn</string>
+    <string name="package_name">br.com.mdcr.mdcr_learn</string>
+    <string name="custom_url_scheme">br.com.mdcr.mdcr_learn</string>
 </resources>
