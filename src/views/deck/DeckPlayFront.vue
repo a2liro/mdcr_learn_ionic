@@ -47,7 +47,7 @@
                 <div class="words" style="display:none;">
                 <p id="p"></p>
               </div>
-              <div id="result"></div>
+              <div :id="`result-${randId}`"></div>
               </ion-card-subtitle>
             </ion-card-header>
 
@@ -248,7 +248,7 @@ import * as differ from 'diff'
 
 function changed() {
   var b = document.getElementById('p');
-var result = document.getElementById('result');
+var result = document.getElementById(`result-${randId.value}`);
 
 console.log(result);
 
@@ -273,7 +273,7 @@ console.log(result);
   .replace(/[\[\]{}"]/g, '')
 
 
-	var diffLocal = differ['diffChars'](cardFront.toLowerCase(), speechResult.value.toLowerCase()) //JsDiff['diffChars'](aValue, speechResult.value.textContent.toLowerCase());
+	var diffLocal = differ['diffWords'](cardFront.toLowerCase(), speechResult.value.toLowerCase()) //JsDiff['diffChars'](aValue, speechResult.value.textContent.toLowerCase());
 	var fragment = document.createDocumentFragment();
 	for (var i=0; i < diffLocal.length; i++) {
 

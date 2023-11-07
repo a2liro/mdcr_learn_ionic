@@ -57,8 +57,8 @@ onIonViewDidEnter
 import userService from '@/services/userService';
 import { onMounted, ref } from 'vue';
 
-const email = ref('andreliro1945@gmail.com');
-const password = ref('12345678');
+const email = ref('');
+const password = ref('');
 const user = ref({})
 
 const router = useIonRouter();
