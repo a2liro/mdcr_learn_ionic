@@ -273,7 +273,7 @@ console.log(result);
   .replace(/[\[\]{}"]/g, '')
 
 
-	var diffLocal = differ['diffChars'](cardFront.toLowerCase(), speechResult.value.toLowerCase()) //JsDiff['diffChars'](aValue, speechResult.value.textContent.toLowerCase());
+	var diffLocal = differ['diffWords'](cardFront.toLowerCase(), speechResult.value.toLowerCase()) //JsDiff['diffChars'](aValue, speechResult.value.textContent.toLowerCase());
 	var fragment = document.createDocumentFragment();
 	for (var i=0; i < diffLocal.length; i++) {
 
