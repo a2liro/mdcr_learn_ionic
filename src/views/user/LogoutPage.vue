@@ -3,7 +3,7 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button defaultHref="/login" text="Voltar"></ion-back-button>
+          <ion-back-button defaultHref="/courses" text="Voltar"></ion-back-button>
         </ion-buttons>
         <ion-title>Deseja realmente sair?</ion-title>
       </ion-toolbar>
@@ -14,7 +14,7 @@
         <div class="logo-container">
           <ion-img src="/assets/images/logo_001_512x512.png" class="logo"></ion-img>
         </div>
-        <ion-button fill="outline" @click="login" strong="true" class="btn-login">Sair</ion-button>
+        <ion-button fill="outline" @click="logout" strong="true" class="btn-login">Sair</ion-button>
       </div>
     </ion-content>
   </ion-page>
@@ -38,6 +38,7 @@ import {
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import { ref } from 'vue';
+import userStore from "@/stores/userStore";
 
 const email = ref('');
 const password = ref('');
@@ -48,13 +49,9 @@ const router = useIonRouter();
 const isOpen = ref(false);
 const alertButtons = ['OK'];
 
-async function login() {
-  user.value = await userService.login(email.value, password.value);
-  if (user.value.id) {
-    router.navigate('/courses');
-  }else {
-    setOpen(true)
-  }
+async function logout() {
+  await userStore.setUser(null)
+    router.navigate('/home');
 }
 
 
