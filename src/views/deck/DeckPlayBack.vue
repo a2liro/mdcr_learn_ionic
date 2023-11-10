@@ -154,8 +154,6 @@ const quillBackStart = function () {
 
   newEditorBack.value = document.getElementById(`editor-back-${randId.value}`);
 
-  console.log(`editor-back-${randId}`);
-
   quillBack = new Quill(newEditorBack.value, {
     theme: 'bubble',
   });
@@ -165,12 +163,9 @@ const quillBackStart = function () {
 const sendNote = async function(note: any) {
   try {
     const response = await cardService.sendNote(card.value.deck_id, card.value.id, note)
-    console.log(response)
     if(response.message == 'no_cards') {
       const currentDeck = await deckStore.getCurrentDeck();
-      console.log(currentDeck)
       router.navigate(`/courses/home/${currentDeck.id}`, 'root')
-      // router.push(`/courses/home/${currentDeck.id}`)
     } else {
       router.navigate('/deck/play/' + card.value.deck_id, 'root')
     }

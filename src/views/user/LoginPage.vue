@@ -70,18 +70,15 @@ const loading = ref<HTMLIonLoadingElement>();
 
 onIonViewWillEnter(async () => {
   loading.value = await showLoading(150);
-  console.log('will')
 })
 
 onIonViewDidEnter(async () => {
   await loading.value?.dismiss()
-  console.log('did')
 })
 
 async function login() {
   loading.value = await showLoading(0)
   user.value = await userService.login(email.value, password.value);
-  console.log(user.value)
   if (user.value?.user?.id) {
     loading.value.dismiss();
     router.navigate('/courses');
