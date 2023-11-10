@@ -12,15 +12,15 @@
 
     <ion-content>
       <div id="container">
-        <swiper :slides-per-view="2.6" :loop="false" id="swiper-categories">
+        <swiper :slides-per-view="2.6" id="swiper-categories" :space-between="50" @swiper="onSwiper"
+          @slideChange="onSlideChange">
           <swiper-slide v-for="category in course.categories" :key="category">
-            <span @click="showDecksByCategory(category.id)" class="category-name">{{ category.name }}</span>
+            <div @click="showDecksByCategory(category.id)" class="category-name">{{ category.name }}</div>
           </swiper-slide>
         </swiper>
         <ion-toolbar>
           <ion-title>Em andamento</ion-title>
         </ion-toolbar>
-
         <swiper :slides-per-view="2.2" :loop="false" id="swiper-decks">
           <swiper-slide v-for="deck in course.decksInProgressToShow" :key="deck">
 
@@ -69,14 +69,10 @@ import {
   IonTitle,
   IonToolbar,
   IonBackButton,
-  IonItem,
-  IonInput,
-  IonButton,
+  
   IonCard,
-  IonCardContent,
   IonCardHeader,
   IonCardSubtitle,
-  IonCardTitle,
   onIonViewDidEnter,
   IonCol,
   IonGrid,
@@ -87,17 +83,12 @@ import {
   loadingController,
   IonMenuButton
 } from '@ionic/vue';
-import userService from '@/services/userService';
 import courseService from '@/services/courseService';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
 import { Swiper, SwiperSlide } from 'swiper/vue';
 
 import deckStore from '@/stores/deckStore'
-
-
-// import { Navigation } from 'swiper/modules';
-
 
 import { ref } from 'vue';
 import server from '@/config/server';
@@ -166,7 +157,7 @@ const showLoading = async function () {
   return loading
 }
 
-const showDecksByCategory = async function(categoryId: any) {
+const showDecksByCategory = async function (categoryId: any) {
   const loading = await loadingController.create({
     message: 'Loading...',
     mode: 'ios',
@@ -175,7 +166,7 @@ const showDecksByCategory = async function(categoryId: any) {
   });
 
   loading.present();
-  if(categoryId == 0) {
+  if (categoryId == 0) {
     course.value.newDecksToShow = course.value.newDecks
     course.value.decksInProgressToShow = course.value.decksInProgress
   } else {
@@ -194,6 +185,8 @@ const showDecksByCategory = async function(categoryId: any) {
   padding-right: 1em;
   box-shadow: 1px 8px 15px #518561;
 }
+
+
 
 .category-name {
   color: #518561;
@@ -235,5 +228,9 @@ button.alert-button.alert-button-confirm {
 
 .card-deck-header {
   height: 6em;
+}
+
+#swiper-categories .swiper-slide {
+  max-width:7.5em;
 }
 </style>

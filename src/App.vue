@@ -3,7 +3,7 @@
     <ion-router-outlet v-if="$route.fullPath === '/home' || $route.fullPath === '/login'"
       id="main-content"></ion-router-outlet>
     <ion-split-pane v-else content-id="main-content">
-      {{ getUser() }}
+      <span style="display: none;">{{ getUser() }}</span>
       <ion-menu content-id="main-content" type="overlay">
         <ion-content>
           <ion-list id="inbox-list">
