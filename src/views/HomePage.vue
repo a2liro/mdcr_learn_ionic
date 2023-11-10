@@ -37,7 +37,6 @@ const router = useIonRouter();
 
 onIonViewWillEnter(async () => {
   const userLogged = await userStore.getUser();
-  console.log(userLogged)
   if (userLogged) {
     router.navigate('/courses');
   }

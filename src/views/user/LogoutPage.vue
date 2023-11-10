@@ -50,7 +50,6 @@ const alertButtons = ['OK'];
 
 async function login() {
   user.value = await userService.login(email.value, password.value);
-  console.log(user.value)
   if (user.value.id) {
     router.navigate('/courses');
   }else {

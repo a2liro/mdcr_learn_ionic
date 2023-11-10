@@ -181,8 +181,6 @@ onIonViewDidEnter(async () => {
 
   const newEditor = ref()
   newEditor.value = document.getElementById(`editor-${randId.value}`);
-  console.log(`editor-${card.value.id}`, newEditor.value);
-
   quill = new Quill(newEditor.value, {
     theme: 'bubble',
   });
@@ -211,6 +209,7 @@ const startRecognition = async function () {
   if (hasPermissions.speechRecognition !== 'granted') {
     SpeechRecognition.requestPermissions();
   }
+  noHear.value = '';
   isListening.value = true;
   SpeechRecognition.start({
     language: "en-US",
@@ -249,9 +248,6 @@ import * as differ from 'diff'
 function changed() {
   var b = document.getElementById('p');
 var result = document.getElementById(`result-${randId.value}`);
-
-console.log(result);
-
 
   let cardFront = card.value.front.split('/')[0];
 
@@ -298,7 +294,6 @@ console.log(result);
 
 	result.textContent = '';
 	result.appendChild(fragment);
-  console.log(fragment)
 }
 
 </script>
