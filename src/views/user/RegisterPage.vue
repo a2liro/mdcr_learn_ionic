@@ -97,7 +97,6 @@ async function register() {
   loading.value = await showLoading(0)
   user.value = await userService.register(name.value, email.value, password.value);
   loading.value.dismiss();
-  console.log(user.value)
   if (user.value?.user?.id) {
     router.navigate('/courses');
   }else {
