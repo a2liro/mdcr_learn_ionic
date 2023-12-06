@@ -23,8 +23,13 @@
         </ion-toolbar>
         <swiper :slides-per-view="2.2" :loop="false" id="swiper-decks">
           <swiper-slide v-for="deck in course.decksInProgressToShow" :key="deck">
-
+            
             <ion-card :id="'present-alert' + deck.id">
+              <ion-item class="badge-item-playing">
+                <ion-badge slot="start" color="success" class="badge-item-playing-left">{{ deck.totalNewCards }}</ion-badge>
+                <ion-badge slot="end" color="warning" class="badge-item-playing-right">{{ deck.totalCardsToPlayAgain }}</ion-badge>
+              </ion-item>
+              
               <img alt="deck logo" :src="server + '/' + deck.thumbnail" />
               <ion-card-header class="card-deck-header">
                 <ion-card-subtitle>{{ deck.name }}</ion-card-subtitle>
@@ -41,7 +46,11 @@
           <ion-grid>
             <ion-row>
               <ion-col size="6" v-for="deck in course.newDecksToShow" :key="deck">
+                <ion-item class="badge-item">
+                <ion-badge slot="start" color="success">{{ deck.totalNewCards }} cards</ion-badge>
+              </ion-item>
                 <ion-card :id="'present-alert' + deck.id">
+
 
                   <img alt="deck logo" :src="server + '/' + deck.thumbnail" />
                   <ion-card-header class="card-deck-header">
@@ -69,7 +78,7 @@ import {
   IonTitle,
   IonToolbar,
   IonBackButton,
-  
+  IonBadge,
   IonCard,
   IonCardHeader,
   IonCardSubtitle,
@@ -195,6 +204,35 @@ const showDecksByCategory = async function (categoryId: any) {
 ion-alert.custom-alert {
   --backdrop-opacity: 0.7;
 }
+
+.badge-item {
+  height: 2em;
+  position: absolute;
+  --ion-item-background:#ffffff00;
+}
+.badge-item-playing {
+  height: 2em;
+  position: absolute;
+  --ion-item-background:#ffffff00;
+  top: -0.7em;
+  width: 100%;
+}
+
+.badge-item-playing-right {
+  position: relative;
+  right: -1em;
+  margin: 0;
+}
+
+.badge-item-playing-left {
+  position: relative;
+  left: -1em;
+  margin: 0;
+}
+
+ion-badge {
+    opacity: 0.9;
+  }
 </style>
 
 <style>
