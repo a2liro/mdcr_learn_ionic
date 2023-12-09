@@ -11,6 +11,9 @@
     </ion-header>
 
     <ion-content>
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
       <div v-if="noNetwork" class="no-network">
         <h3>Não conseguimos conectart a internet</h3>
         <ion-button @click="getAllData()">
@@ -102,7 +105,10 @@ import {
   loadingController,
   IonMenuButton,
   IonItem,
-  IonIcon
+  IonIcon,
+  IonRefresher,
+  IonRefresherContent,
+  IonButton
 } from '@ionic/vue';
 import courseService from '@/services/courseService';
 import 'swiper/css';
@@ -156,7 +162,7 @@ const getAllData = async function () {
     course.value.decksInProgress = course.value.decks.filter((item) => item.isPlaying == true)
     course.value.newDecks = course.value.decks.filter((item) => item.isPlaying == false)
     course.value.decksInProgressToShow = course.value.decksInProgress
-    course.value.newDecksToShow = course.value.newDecks
+    course.value.newDecksToShow = shuffle(course.value.newDecks)
     course.value.categories[0] = { id: 0, name: 'Todos' }
     loading.value?.dismiss();
   } catch (error) {
@@ -164,6 +170,8 @@ const getAllData = async function () {
     console.log(error.message)
     loading.value?.dismiss();
   }
+
+  console.log(course.value.newDecks, '--------------, ', course.value.newDecksToShow)
 }
 
 const startNewDeck = async function (ev: CustomEvent, deckId: any) {
@@ -210,6 +218,20 @@ const showDecksByCategory = async function (categoryId: any) {
     course.value.decksInProgressToShow = course.value.decksInProgress.filter(deck => deck.category_id == categoryId)
   }
 }
+
+const handleRefresh = async (event: CustomEvent) => {
+  await getAllData();
+  event.target.complete();
+};
+
+const shuffle = (array: string[]) => { 
+  for (let i = array.length - 1; i > 0; i--) { 
+    const j = Math.floor(Math.random() * (i + 1)); 
+    [array[i], array[j]] = [array[j], array[i]]; 
+  } 
+  return array;
+  
+}; 
 
 </script>
 

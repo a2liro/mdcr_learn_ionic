@@ -11,7 +11,17 @@
     </ion-header>
 
     <ion-content>
-      <div id="container">
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      <div v-if="noNetwork" class="no-network">
+        <h3>Não conseguimos conectart a internet</h3>
+        <ion-button @click="getCourses()">
+          <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
+          Atualizar
+        </ion-button>
+      </div>
+      <div id="container" v-else>
         <ion-grid>
           <ion-row>
             <ion-col size="12" size-md="4" size-lg="3" v-for="course in courses" :key="course">
@@ -51,26 +61,43 @@ import {
   IonGrid,
   IonRow,
   loadingController,
-  onIonViewWillEnter,
-  IonMenuButton
+  IonButton,
+  IonMenuButton,
+  IonRefresher,
+  IonRefresherContent
 } from '@ionic/vue';
-import userService from '@/services/userService';
 import courseService from '@/services/courseService';
+import { refreshOutline } from 'ionicons/icons';
+
 
 import { ref } from 'vue';
 import server from '@/config/server';
 const courses = ref([])
+const noNetwork = ref(false)
+
 
 const loading = ref<HTMLIonLoadingElement>();
 
-onIonViewWillEnter(async () => {
-  loading.value = await showLoading();
-})
+// onIonViewWillEnter(async () => {
+//   loading.value = await showLoading();
+// })
 
 onIonViewDidEnter(async () => {
-  courses.value = await courseService.getCourses();
-  loading.value?.dismiss();
+  await getCourses();
 })
+
+const getCourses = async function () {
+  try {
+    loading.value = await showLoading();
+    noNetwork.value = false;
+    courses.value = await courseService.getCourses();
+    loading.value?.dismiss();
+  } catch (error) {
+    noNetwork.value = true
+    console.log(error.message)
+    loading.value?.dismiss();
+  }
+}
 
 
 const showLoading = async function () {
@@ -83,6 +110,11 @@ const showLoading = async function () {
   loading.present();
   return loading
 }
+
+const handleRefresh = async (event: CustomEvent) => {
+  await getCourses();
+  event.target.complete();
+};
 
 </script>
 
