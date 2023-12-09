@@ -15,7 +15,7 @@
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
       <div v-if="noNetwork" class="no-network">
-        <h3>Não conseguimos conectart a internet</h3>
+        <h3>Não conseguimos conectar a internet</h3>
         <ion-button @click="getAllData()">
           <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
           Atualizar
@@ -108,7 +108,7 @@ import {
   IonIcon,
   IonRefresher,
   IonRefresherContent,
-  IonButton
+  IonButton,
 } from '@ionic/vue';
 import courseService from '@/services/courseService';
 import 'swiper/css';
@@ -154,7 +154,7 @@ onIonViewDidEnter(async () => {
 });
 
 const getAllData = async function () {
-  
+
   try {
     loading.value = await showLoading();
     noNetwork.value = false;
@@ -170,24 +170,32 @@ const getAllData = async function () {
     console.log(error.message)
     loading.value?.dismiss();
   }
-
-  console.log(course.value.newDecks, '--------------, ', course.value.newDecksToShow)
 }
 
 const startNewDeck = async function (ev: CustomEvent, deckId: any) {
   if (ev.detail.role == 'confirm') {
-    loading.value = await showLoading()
-    loading.value?.present();
-    const card = await deckService.playDeck(deckId)
-    if (card.length === 0) {
+
+    try {
+      noNetwork.value = false;
+      loading.value = await showLoading()
+      loading.value?.present();
+      const card = await deckService.playDeck(deckId)
+      if (card.length === 0) {
+        loading.value?.dismiss();
+        alert('Sem cards para praticar')
+      } else {
+        const currentDeck = course.value.decks.filter((item) => item.id == deckId)
+        deckStore.setCurrentDeck(currentDeck[0]);
+        loading.value?.dismiss();
+        router.push('/deck/play/' + deckId)
+      }
       loading.value?.dismiss();
-      alert('Sem cards para praticar')
-    } else {
-      const currentDeck = course.value.decks.filter((item) => item.id == deckId)
-      deckStore.setCurrentDeck(currentDeck[0]);
+    } catch (error) {
+      noNetwork.value = true
+      console.log(error.message)
       loading.value?.dismiss();
-      router.push('/deck/play/' + deckId)
     }
+
   }
 }
 const showLoading = async function () {
@@ -224,14 +232,14 @@ const handleRefresh = async (event: CustomEvent) => {
   event.target.complete();
 };
 
-const shuffle = (array: string[]) => { 
-  for (let i = array.length - 1; i > 0; i--) { 
-    const j = Math.floor(Math.random() * (i + 1)); 
-    [array[i], array[j]] = [array[j], array[i]]; 
-  } 
+const shuffle = (array: string[]) => {
+  for (let i = array.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [array[i], array[j]] = [array[j], array[i]];
+  }
   return array;
-  
-}; 
+
+};
 
 </script>
 
@@ -283,8 +291,6 @@ ion-alert.custom-alert {
 ion-badge {
   opacity: 0.9;
 }
-
-
 </style>
 
 <style>

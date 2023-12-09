@@ -15,7 +15,7 @@
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
       <div v-if="noNetwork" class="no-network">
-        <h3>Não conseguimos conectart a internet</h3>
+        <h3>Não conseguimos conectar a internet</h3>
         <ion-button @click="getCourses()">
           <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
           Atualizar
@@ -64,7 +64,8 @@ import {
   IonButton,
   IonMenuButton,
   IonRefresher,
-  IonRefresherContent
+  IonRefresherContent,
+  IonIcon,
 } from '@ionic/vue';
 import courseService from '@/services/courseService';
 import { refreshOutline } from 'ionicons/icons';

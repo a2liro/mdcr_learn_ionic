@@ -91,6 +91,7 @@ import {
   useIonRouter,
 onIonViewWillEnter,
 loadingController,
+toastController,
 } from '@ionic/vue';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
@@ -161,16 +162,23 @@ const quillBackStart = function () {
 }
 
 const sendNote = async function(note: any) {
+  loading.value = await showLoading();
   try {
     const response = await cardService.sendNote(card.value.deck_id, card.value.id, note)
+    const currentDeck = await deckStore.getCurrentDeck();
+    console.log(response, '--------', currentDeck, '*************');
+    
+    loading.value.dismiss();
     if(response.message == 'no_cards') {
-      const currentDeck = await deckStore.getCurrentDeck();
+      
       router.navigate(`/courses/home/${currentDeck.id}`, 'root')
     } else {
       router.navigate('/deck/play/' + card.value.deck_id, 'root')
     }
   }catch(error) {
     console.log(error)
+    loading.value.dismiss();
+    presentToast();
   }
 }
 
@@ -183,6 +191,16 @@ const showLoading = async function () {
 
   loading.present();
   return loading
+}
+
+const presentToast = async function () {
+  const toast = await toastController.create({
+          message: 'Houve um problema ao atribuir sua nota. Tente novamente!',
+          duration: 2000,
+          position: 'bottom',
+        });
+
+        await toast.present();
 }
 </script>
 

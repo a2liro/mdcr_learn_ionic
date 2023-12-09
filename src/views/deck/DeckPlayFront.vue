@@ -10,7 +10,17 @@
     </ion-header>
 
     <ion-content>
-      <div id="container">
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      <div v-show="noNetwork" class="no-network">
+        <h3>Não conseguimos conectar a internet</h3>
+        <ion-button @click="refreshClick()">
+          <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
+          Atualizar
+        </ion-button>
+      </div>
+      <div id="container" v-show="!noNetwork">
         <ion-card>
           <ion-card-header>
             <ion-card-title>Audio:</ion-card-title>
@@ -18,8 +28,8 @@
           </ion-card-header>
 
           <ion-card-content>
-            <audio controls autoplay v-if="card?.audiofile">
-              <source :src="server + '/' + card?.audiofile" type="audio/mpeg">
+            <audio controls autoplay v-if="card?.audiofile" ref="elementAudio">
+              <source :src="server + '/' + card?.audiofile" ref="elementSource" type="audio/mpeg">
               Your browser does not support the audio element.
             </audio>
           </ion-card-content>
@@ -45,9 +55,9 @@
               <ion-card-subtitle>Resultado:
 
                 <div class="words" style="display:none;">
-                <p id="p"></p>
-              </div>
-              <div :id="`result-${randId}`"></div>
+                  <p id="p"></p>
+                </div>
+                <div :id="`result-${randId}`"></div>
               </ion-card-subtitle>
             </ion-card-header>
 
@@ -83,9 +93,6 @@
 </template>
 
 <script setup lang="ts">
-
-const email = ref('andreliro1945@gmail.com');
-const password = ref('12345678');
 import {
   IonButtons,
   IonContent,
@@ -94,8 +101,6 @@ import {
   IonTitle,
   IonToolbar,
   IonBackButton,
-  IonItem,
-  IonInput,
   IonButton,
   IonCard,
   IonCardContent,
@@ -104,21 +109,16 @@ import {
   IonCardTitle,
   onIonViewDidEnter,
   onIonViewWillEnter,
-  IonCol,
-  IonGrid,
-  IonRow,
-  useIonRouter,
-  IonAlert,
   IonFooter,
   IonIcon,
-loadingController
+  loadingController,
+  IonRefresher,
+  IonRefresherContent,
+  onIonViewWillLeave,
 } from '@ionic/vue';
-import userService from '@/services/userService';
-import courseService from '@/services/courseService';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
-import { Swiper, SwiperSlide } from 'swiper/vue';
-import { micOutline, square, chevronForward } from 'ionicons/icons';
+import { micOutline, square, chevronForward, refreshOutline } from 'ionicons/icons';
 
 
 import { ref, watch } from 'vue';
@@ -137,7 +137,6 @@ import { isPlatform } from '@ionic/vue';
 
 
 const editor = ref();
-const _content = ref('');
 let quill: Quill;
 
 const speechResult = ref('')
@@ -145,19 +144,9 @@ const speechResult = ref('')
 const randId = ref(Math.random())
 
 const noHear = ref<String>('')
-
-
-// Quill.register({
-//   'modules/toolbar': Toolbar,
-//   'themes/snow': Snow,
-//   'formats/bold': Bold,
-//   'formats/italic': Italic,
-//   'formats/header': Header
-// });
-
-// var editor = new Quill('#editor');
-
-// var quill = new Quill('#editor');]
+const elementAudio = ref(null);
+const noNetwork = ref(false);
+const elementSource = ref(null);
 
 const card = ref([])
 const route = useRoute();
@@ -176,6 +165,16 @@ onIonViewWillEnter(async () => {
 })
 
 onIonViewDidEnter(async () => {
+
+  await getData()
+  elementSource.value?.addEventListener('error', (event) => {
+    console.log(event)
+    noNetwork.value = true
+  })
+
+});
+
+const getData = async function () {
 
   card.value = await cardStore.getCard();
 
@@ -203,7 +202,7 @@ onIonViewDidEnter(async () => {
 
     }
   }
-});
+};
 
 const startRecognition = async function () {
   if (hasPermissions.speechRecognition !== 'granted') {
@@ -247,55 +246,68 @@ import * as differ from 'diff'
 
 function changed() {
   var b = document.getElementById('p');
-var result = document.getElementById(`result-${randId.value}`);
+  var result = document.getElementById(`result-${randId.value}`);
 
   let cardFront = card.value.front.split('/')[0];
 
   cardFront = cardFront
-  .replaceAll('"ops":', '')
-  .replaceAll('"insert":', '')
-  .replaceAll('"attributes":', '')
-  .replaceAll('"size":', '')
-  .replaceAll('"large"', '')
-  .replaceAll('"normal"', '')
-  .replaceAll('"color":', '')
-  .replaceAll('"background":', '')
-  .replaceAll("\\n", '')
-  .replaceAll("],", '')
-  .replaceAll("},", '')
-  .replaceAll("{,", '')
-  .replace(/",/g, '')
-  .replaceAll(/#[0-9A-Fa-f]{6}/g, '')
-  .replace(/[\[\]{}"]/g, '')
+    .replaceAll('"ops":', '')
+    .replaceAll('"insert":', '')
+    .replaceAll('"attributes":', '')
+    .replaceAll('"size":', '')
+    .replaceAll('"large"', '')
+    .replaceAll('"normal"', '')
+    .replaceAll('"color":', '')
+    .replaceAll('"background":', '')
+    .replaceAll("\\n", '')
+    .replaceAll("],", '')
+    .replaceAll("},", '')
+    .replaceAll("{,", '')
+    .replace(/",/g, '')
+    .replaceAll(/#[0-9A-Fa-f]{6}/g, '')
+    .replace(/[\[\]{}"]/g, '')
 
 
-	var diffLocal = differ['diffWords'](cardFront.toLowerCase(), speechResult.value.toLowerCase()) //JsDiff['diffChars'](aValue, speechResult.value.textContent.toLowerCase());
-	var fragment = document.createDocumentFragment();
-	for (var i=0; i < diffLocal.length; i++) {
+  var diffLocal = differ['diffWords'](cardFront.toLowerCase(), speechResult.value.toLowerCase()) //JsDiff['diffChars'](aValue, speechResult.value.textContent.toLowerCase());
+  var fragment = document.createDocumentFragment();
+  for (var i = 0; i < diffLocal.length; i++) {
 
-		if (diffLocal[i].added && diffLocal[i + 1] && diffLocal[i + 1].removed) {
-			var swap = diffLocal[i];
-			diffLocal[i] = diffLocal[i + 1];
-			diffLocal[i + 1] = swap;
-		}
+    if (diffLocal[i].added && diffLocal[i + 1] && diffLocal[i + 1].removed) {
+      var swap = diffLocal[i];
+      diffLocal[i] = diffLocal[i + 1];
+      diffLocal[i + 1] = swap;
+    }
 
-		var node;
-		if (diffLocal[i].removed) {
-			node = document.createElement('del');
-			node.appendChild(document.createTextNode(diffLocal[i].value));
-		} else if (diffLocal[i].added) {
-			node = document.createElement('ins');
-			node.appendChild(document.createTextNode(diffLocal[i].value));
-		} else {
-			node = document.createTextNode(diffLocal[i].value);
-		}
-		fragment.appendChild(node);
-	}
+    var node;
+    if (diffLocal[i].removed) {
+      node = document.createElement('del');
+      node.appendChild(document.createTextNode(diffLocal[i].value));
+    } else if (diffLocal[i].added) {
+      node = document.createElement('ins');
+      node.appendChild(document.createTextNode(diffLocal[i].value));
+    } else {
+      node = document.createTextNode(diffLocal[i].value);
+    }
+    fragment.appendChild(node);
+  }
 
-	result.textContent = '';
-	result.appendChild(fragment);
+  result.textContent = '';
+  result.appendChild(fragment);
 }
 
+onIonViewWillLeave(() => {
+  elementAudio.value?.pause();
+  elementAudio.value.currentTime = 0;
+})
+
+
+const handleRefresh = async (event: CustomEvent) => {
+  location.reload();
+};
+
+const refreshClick = async (event: CustomEvent) => {
+  location.reload();
+};
 </script>
 
 <style scoped>

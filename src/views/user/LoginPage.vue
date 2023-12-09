@@ -12,7 +12,7 @@
     <ion-content>
       
       <div v-if="noNetwork" class="no-network">
-        <h3>Não conseguimos conectart a internet</h3>
+        <h3>Não conseguimos conectar a internet</h3>
         <ion-button @click="showLoginContent()">
           <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
           Atualizar
