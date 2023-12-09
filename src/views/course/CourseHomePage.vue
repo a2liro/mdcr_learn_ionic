@@ -11,9 +11,17 @@
     </ion-header>
 
     <ion-content>
-      <div id="container">
-        <swiper :slides-per-view="2.6" id="swiper-categories" :space-between="50" @swiper="onSwiper"
-          @slideChange="onSlideChange">
+      <div v-if="noNetwork" class="no-network">
+        <h3>Não conseguimos conectart a internet</h3>
+        <ion-button @click="getAllData()">
+          <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
+          Atualizar
+        </ion-button>
+      </div>
+      <div id="container" v-else>
+        <!-- <swiper :slides-per-view="2.6" id="swiper-categories" :space-between="50" @swiper="onSwiper"
+          @slideChange="onSlideChange"> -->
+        <swiper :slides-per-view="2.6" id="swiper-categories" :space-between="50">
           <swiper-slide v-for="category in course.categories" :key="category">
             <div @click="showDecksByCategory(category.id)" class="category-name">{{ category.name }}</div>
           </swiper-slide>
@@ -23,13 +31,15 @@
         </ion-toolbar>
         <swiper :slides-per-view="2.2" :loop="false" id="swiper-decks">
           <swiper-slide v-for="deck in course.decksInProgressToShow" :key="deck">
-            
+
             <ion-card :id="'present-alert' + deck.id">
               <ion-item class="badge-item-playing">
-                <ion-badge slot="start" color="success" class="badge-item-playing-left">{{ deck.totalNewCards }}</ion-badge>
-                <ion-badge slot="end" color="warning" class="badge-item-playing-right">{{ deck.totalCardsToPlayAgain }}</ion-badge>
+                <ion-badge slot="start" color="success" class="badge-item-playing-left">{{ deck.totalNewCards
+                }}</ion-badge>
+                <ion-badge slot="end" color="warning" class="badge-item-playing-right">{{ deck.totalCardsToPlayAgain
+                }}</ion-badge>
               </ion-item>
-              
+
               <img alt="deck logo" :src="server + '/' + deck.thumbnail" />
               <ion-card-header class="card-deck-header">
                 <ion-card-subtitle>{{ deck.name }}</ion-card-subtitle>
@@ -47,8 +57,8 @@
             <ion-row>
               <ion-col size="6" v-for="deck in course.newDecksToShow" :key="deck">
                 <ion-item class="badge-item">
-                <ion-badge slot="start" color="success">{{ deck.totalNewCards }} cards</ion-badge>
-              </ion-item>
+                  <ion-badge slot="start" color="success">{{ deck.totalNewCards }} cards</ion-badge>
+                </ion-item>
                 <ion-card :id="'present-alert' + deck.id">
 
 
@@ -90,12 +100,16 @@ import {
   IonAlert,
   onIonViewWillEnter,
   loadingController,
-  IonMenuButton
+  IonMenuButton,
+  IonItem,
+  IonIcon
 } from '@ionic/vue';
 import courseService from '@/services/courseService';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
 import { Swiper, SwiperSlide } from 'swiper/vue';
+import { refreshOutline } from 'ionicons/icons';
+
 
 import deckStore from '@/stores/deckStore'
 
@@ -110,6 +124,7 @@ const course = ref({
 const route = useRoute();
 const router = useIonRouter();
 const loading = ref<HTMLIonLoadingElement>();
+const noNetwork = ref(false)
 
 const alertButtons = ref([
   {
@@ -125,19 +140,31 @@ const alertButtons = ref([
 ])
 
 onIonViewWillEnter(async () => {
-  loading.value = await showLoading();
+  // loading.value = await showLoading();
 })
 
 onIonViewDidEnter(async () => {
-  course.value = await courseService.getCourseData(route.params.id);
-  course.value.decksInProgress = course.value.decks.filter((item) => item.isPlaying == true)
-  course.value.newDecks = course.value.decks.filter((item) => item.isPlaying == false)
-  course.value.decksInProgressToShow = course.value.decksInProgress
-  course.value.newDecksToShow = course.value.newDecks
-
-  course.value.categories[0] = {id: 0, name: 'Todos'}
-  loading.value?.dismiss();
+  await getAllData();
 });
+
+const getAllData = async function () {
+  
+  try {
+    loading.value = await showLoading();
+    noNetwork.value = false;
+    course.value = await courseService.getCourseData(route.params.id);
+    course.value.decksInProgress = course.value.decks.filter((item) => item.isPlaying == true)
+    course.value.newDecks = course.value.decks.filter((item) => item.isPlaying == false)
+    course.value.decksInProgressToShow = course.value.decksInProgress
+    course.value.newDecksToShow = course.value.newDecks
+    course.value.categories[0] = { id: 0, name: 'Todos' }
+    loading.value?.dismiss();
+  } catch (error) {
+    noNetwork.value = true
+    console.log(error.message)
+    loading.value?.dismiss();
+  }
+}
 
 const startNewDeck = async function (ev: CustomEvent, deckId: any) {
   if (ev.detail.role == 'confirm') {
@@ -208,12 +235,13 @@ ion-alert.custom-alert {
 .badge-item {
   height: 2em;
   position: absolute;
-  --ion-item-background:#ffffff00;
+  --ion-item-background: #ffffff00;
 }
+
 .badge-item-playing {
   height: 2em;
   position: absolute;
-  --ion-item-background:#ffffff00;
+  --ion-item-background: #ffffff00;
   top: -0.7em;
   width: 100%;
 }
@@ -231,8 +259,10 @@ ion-alert.custom-alert {
 }
 
 ion-badge {
-    opacity: 0.9;
-  }
+  opacity: 0.9;
+}
+
+
 </style>
 
 <style>
@@ -269,6 +299,6 @@ button.alert-button.alert-button-confirm {
 }
 
 #swiper-categories .swiper-slide {
-  max-width:7.5em;
+  max-width: 7.5em;
 }
 </style>

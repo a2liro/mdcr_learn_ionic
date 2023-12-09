@@ -209,3 +209,14 @@ ion-item.selected {
   --color: var(--ion-color-primary);
 }
 </style>
+
+<style>
+.no-network {
+  text-align: center;
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+}
+</style>
