@@ -10,16 +10,25 @@
     </ion-header>
 
     <ion-content :fullscreen="true">
-
-      <div id="container">
+      <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
+        <ion-refresher-content></ion-refresher-content>
+      </ion-refresher>
+      <div v-show="noNetwork" class="no-network">
+        <h3>Não conseguimos conectar a internet</h3>
+        <ion-button @click="refreshClick()">
+          <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
+          Atualizar
+        </ion-button>
+      </div>
+      <div id="container" v-show="!noNetwork">
         <ion-card>
           <ion-card-header>
             <ion-card-title>Audio:</ion-card-title>
           </ion-card-header>
 
           <ion-card-content>
-            <audio controls autoplay v-if="card?.audiofile" :id="'audio' + Math.random()">
-              <source :src="server + '/' + card?.audiofile" type="audio/mpeg">
+            <audio controls autoplay v-if="card?.audiofile" :id="'audio' + Math.random()" ref="elementAudio">
+              <source id="audio-source" ref="elementSource" :src="server + '/' + card?.audiofile" type="audio/mpeg">
               Your browser does not support the audio element.
             </audio>
           </ion-card-content>
@@ -27,7 +36,7 @@
 
       </div>
     </ion-content>
-    <ion-footer>
+    <ion-footer v-show="!noNetwork">
       <ion-toolbar>
         <ion-title>
           <ion-button expand="block" fill="outline" @click="$router.push('/deck/play/front/' + card.id)">
@@ -49,39 +58,25 @@ import {
   IonTitle,
   IonToolbar,
   IonBackButton,
-  IonItem,
-  IonInput,
   IonButton,
   IonCard,
   IonCardContent,
   IonCardHeader,
-  IonCardSubtitle,
   IonCardTitle,
   onIonViewDidEnter,
-  onIonViewWillEnter,
-  IonCol,
-  IonGrid,
-  IonRow,
-  useIonRouter,
-  IonAlert,
   IonFooter,
   IonIcon,
-  loadingController
+  loadingController,
+  IonRefresher,
+  IonRefresherContent,
+  onIonViewWillLeave,
 } from '@ionic/vue';
-import { chevronForward } from 'ionicons/icons';
+import { chevronForward, refreshOutline } from 'ionicons/icons';
 
-import userService from '@/services/userService';
-import courseService from '@/services/courseService';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
-import { Swiper, SwiperSlide } from 'swiper/vue';
 import cardStore from '@/stores/cardStore';
 import deckStore from '@/stores/deckStore';
-
-
-
-// import { Navigation } from 'swiper/modules';
-
 
 import { ref } from 'vue';
 import server from '@/config/server';
@@ -92,18 +87,30 @@ const currentDeck = ref([])
 
 const audioAsset = ref({});
 const loading = ref<HTMLIonLoadingElement>();
-
-
-onIonViewWillEnter(async () => {
-  loading.value = await showLoading();
-})
+const noNetwork = ref(false)
+const elementSource = ref(null);
+const elementAudio = ref(null);
 
 onIonViewDidEnter(async () => {
-  card.value = [];
-  card.value = await cardStore.getCard();
-  currentDeck.value = await deckStore.getCurrentDeck();
-  loading.value?.dismiss();
+  await getData()
+  elementSource.value?.addEventListener('error', (event: Event) => {
+    noNetwork.value = true
+  })
 });
+
+const getData = async function () {
+  try {
+    loading.value = await showLoading();
+    noNetwork.value = false;
+    card.value = [];
+    card.value = await cardStore.getCard();
+    currentDeck.value = await deckStore.getCurrentDeck();
+    loading.value?.dismiss();
+  } catch (error) {
+    noNetwork.value = true
+    loading.value?.dismiss();
+  }
+}
 
 const showLoading = async function () {
   const loading = await loadingController.create({
@@ -115,6 +122,20 @@ const showLoading = async function () {
   loading.present();
   return loading
 }
+
+const handleRefresh = async (event: CustomEvent) => {
+  location.reload();
+};
+
+const refreshClick = async (event: CustomEvent) => {
+  location.reload();
+};
+
+onIonViewWillLeave(() => {
+  elementAudio.value.pause();
+  elementAudio.value.currentTime = 0;
+})
+
 
 </script>
 

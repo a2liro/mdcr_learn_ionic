@@ -10,7 +10,15 @@
     </ion-header>
 
     <ion-content>
-      <div id="container">
+      
+      <div v-if="noNetwork" class="no-network">
+        <h3>Não conseguimos conectar a internet</h3>
+        <ion-button @click="showLoginContent()">
+          <ion-icon slot="start" :icon="refreshOutline"></ion-icon>
+          Atualizar
+        </ion-button>
+      </div>
+      <div id="container" v-else>
         <div class="logo-container">
           <ion-img src="/assets/images/logo_001_512x512.png" class="logo"></ion-img>
         </div>
@@ -52,10 +60,12 @@ import {
   IonImg,
   loadingController,
   onIonViewWillEnter,
-onIonViewDidEnter
+  onIonViewDidEnter,
+  IonIcon,
 } from '@ionic/vue';
 import userService from '@/services/userService';
 import { onMounted, ref } from 'vue';
+import { refreshOutline } from 'ionicons/icons';
 
 const email = ref('');
 const password = ref('');
@@ -66,7 +76,7 @@ const router = useIonRouter();
 const isOpen = ref(false);
 const alertButtons = ['OK'];
 const loading = ref<HTMLIonLoadingElement>();
-
+const noNetwork = ref(false)
 
 onIonViewWillEnter(async () => {
   loading.value = await showLoading(150);
@@ -77,14 +87,23 @@ onIonViewDidEnter(async () => {
 })
 
 async function login() {
-  loading.value = await showLoading(0)
-  user.value = await userService.login(email.value, password.value);
-  if (user.value?.user?.id) {
-    loading.value.dismiss();
-    router.navigate('/courses');
-  } else {
-    setOpen(true)
+
+  try {
+    noNetwork.value = false;
+    loading.value = await showLoading(0)
+    user.value = await userService.login(email.value, password.value);
+    if (user.value?.user?.id) {
+      loading.value.dismiss();
+      router.navigate('/courses');
+    } else {
+      setOpen(true)
+    }
+    loading.value?.dismiss();
+  } catch (error) {
+    noNetwork.value = true
+    loading.value?.dismiss();
   }
+
 }
 
 const setOpen = (state: boolean) => {
@@ -102,6 +121,12 @@ const showLoading = async function (duration) {
   loading.present();
   return loading
 }
+
+const showLoginContent = async function () {
+  noNetwork.value = false;
+}
+
+
 </script>
 
 <style scoped>
@@ -180,5 +205,9 @@ h3 {
 
 .register-actions div {
   margin: 1em;
+}
+
+.no-network ion-button {
+  --color: #fcfcfc;
 }
 </style>
