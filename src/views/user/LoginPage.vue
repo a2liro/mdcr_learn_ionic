@@ -101,7 +101,6 @@ async function login() {
     loading.value?.dismiss();
   } catch (error) {
     noNetwork.value = true
-    console.log(error.message)
     loading.value?.dismiss();
   }
 

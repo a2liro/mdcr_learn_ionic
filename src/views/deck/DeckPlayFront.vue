@@ -168,7 +168,6 @@ onIonViewDidEnter(async () => {
 
   await getData()
   elementSource.value?.addEventListener('error', (event) => {
-    console.log(event)
     noNetwork.value = true
   })
 

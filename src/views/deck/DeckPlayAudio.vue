@@ -106,7 +106,6 @@ const getData = async function () {
     card.value = await cardStore.getCard();
     currentDeck.value = await deckStore.getCurrentDeck();
     loading.value?.dismiss();
-    console.log(server + '/' + card?.audiofile)
   } catch (error) {
     noNetwork.value = true
     loading.value?.dismiss();

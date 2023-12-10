@@ -154,7 +154,6 @@ onIonViewDidEnter(async () => {
 });
 
 const getAllData = async function () {
-
   try {
     loading.value = await showLoading();
     noNetwork.value = false;
@@ -167,7 +166,6 @@ const getAllData = async function () {
     loading.value?.dismiss();
   } catch (error) {
     noNetwork.value = true
-    console.log(error.message)
     loading.value?.dismiss();
   }
 }
@@ -192,7 +190,6 @@ const startNewDeck = async function (ev: CustomEvent, deckId: any) {
       loading.value?.dismiss();
     } catch (error) {
       noNetwork.value = true
-      console.log(error.message)
       loading.value?.dismiss();
     }
 

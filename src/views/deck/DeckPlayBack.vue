@@ -165,18 +165,15 @@ const sendNote = async function(note: any) {
   loading.value = await showLoading();
   try {
     const response = await cardService.sendNote(card.value.deck_id, card.value.id, note)
-    const currentDeck = await deckStore.getCurrentDeck();
-    console.log(response, '--------', currentDeck, '*************');
-    
+    const currentDeck = await deckStore.getCurrentDeck();    
     loading.value.dismiss();
     if(response.message == 'no_cards') {
       
-      router.navigate(`/courses/home/${currentDeck.id}`, 'root')
+      router.navigate(`/courses/home/${currentDeck.course_id}`, 'root')
     } else {
       router.navigate('/deck/play/' + card.value.deck_id, 'root')
     }
   }catch(error) {
-    console.log(error)
     loading.value.dismiss();
     presentToast();
   }
