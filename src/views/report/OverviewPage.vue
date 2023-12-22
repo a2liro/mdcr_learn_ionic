@@ -22,8 +22,11 @@
         </ion-button>
       </div>
       <div id="container" v-else>
-        <div>
+        <!-- <div>
           <apexchart width="500" type="bar" :options="options" :series="series"></apexchart>
+        </div> -->
+        <div id="chart">
+          <apexchart type="heatmap" height="350" :options="chartOptions" :series="series2"></apexchart>
         </div>
       </div>
     </ion-content>
@@ -52,7 +55,7 @@ import {
   IonRefresherContent,
   IonIcon,
 } from '@ionic/vue';
-import courseService from '@/services/courseService';
+import reportService from '@/services/reportService';
 import { refreshOutline } from 'ionicons/icons';
 
 
@@ -79,6 +82,59 @@ const series = ref(
   }]
 )
 
+const series2 = ref<Object[]>([])
+
+const getData = function() {
+  series2.value.push({
+      name: "Series 1",
+      data: [{
+        x: 'W1',
+        y: 22
+      }, {
+        x: 'W2',
+        y: 29
+      }, {
+        x: 'W3',
+        y: 13
+      }, {
+        x: 'W4',
+        y: 32
+      }]
+    },)
+    series2.value.push({
+      name: "Series 2",
+      data: [{
+        x: 'W1',
+        y: 35
+      }, {
+        x: 'W2',
+        y: 15
+      }, {
+        x: 'W3',
+        y: 95
+      }, {
+        x: 'W4',
+        y: 8
+      }]
+    },)
+}
+
+const chartOptions = ref(
+  {
+            chart: {
+              height: 350,
+              type: 'heatmap',
+            },
+            dataLabels: {
+              enabled: false
+            },
+            colors: ["#008FFB"],
+            title: {
+              text: 'HeatMap Chart (Single color)'
+            },
+          }
+)
+
 
 const loading = ref<HTMLIonLoadingElement>();
 
@@ -87,6 +143,7 @@ const loading = ref<HTMLIonLoadingElement>();
 // })
 
 onIonViewDidEnter(async () => {
+  getData();
   await getCourses();
 })
 
@@ -94,7 +151,8 @@ const getCourses = async function () {
   try {
     loading.value = await showLoading();
     noNetwork.value = false;
-    courses.value = await courseService.getCourses();
+    courses.value = await reportService.overview();
+    console.log(courses.value);
     loading.value?.dismiss();
   } catch (error) {
     noNetwork.value = true
