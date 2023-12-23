@@ -22,9 +22,6 @@
         </ion-button>
       </div>
       <div id="container" v-else>
-        <!-- <div>
-          <apexchart width="500" type="bar" :options="options" :series="series"></apexchart>
-        </div> -->
         <div id="chart">
           <apexchart ref="chartBarRef" type="heatmap" height="350" :options="chartOptions" :series="series2"></apexchart>
         </div>
@@ -61,7 +58,7 @@ import { refreshOutline } from 'ionicons/icons';
 
 import { ref } from 'vue';
 import server from '@/config/server';
-const courses = ref([])
+const overview = ref([])
 const noNetwork = ref(false)
 
 const options = ref(
@@ -93,9 +90,9 @@ const chartOptions = ref(
     dataLabels: {
       enabled: false
     },
-    colors: ["#008FFB"],
+    colors: ["#076200"],
     title: {
-      text: 'Frequência'
+      text: 'Frequência',
     },
   }
 )
@@ -110,6 +107,10 @@ const loading = ref<HTMLIonLoadingElement>();
 const chartBarRef = ref();
 
 onIonViewDidEnter(async () => {
+  await fillChart()
+})
+
+const fillChart = async function() {
   await getCourses();
   series2.value = getDates();
 
@@ -118,47 +119,29 @@ onIonViewDidEnter(async () => {
       enabled: true,
       formatter: function (value, opt) {
         return value
-        // if (!isNaN(value)) {
-        //   let newValue = new Intl.NumberFormat("pt-BR", {
-        //     maximumFractionDigits: 3,
-        //   }).format(value);
-        //   return newValue + " " + opt.config.series2[opt.seriesIndex].name;
-        // } else {
-        //   return value;
-        // }
+        if (!isNaN(value)) {
+          let newValue = new Intl.NumberFormat("pt-BR", {
+            maximumFractionDigits: 3,
+          }).format(value);
+          return newValue + " " + opt.config.series2[opt.seriesIndex].name;
+        } else {
+          return value;
+        }
       },
     },
-
-
-
-
     tooltip: {
       custom: function ({ series, seriesIndex, dataPointIndex, w }) {
-        // console.log(series);
-        // console.log(seriesIndex);
-        // console.log(dataPointIndex);
-        // console.log(labels.value);
-        return labels.value[seriesIndex + 1][dataPointIndex]
+        return labels.value[seriesIndex + 1][dataPointIndex] + ': ' + series[seriesIndex][dataPointIndex]
       }
     }
-
-
-    // chart: {
-    //   height:
-    //     categories.value.length > 1 ? categories.value.length * 130 : 230,
-    // },
-    // xaxis: {
-    //   categories: categories.value,
-    // },
   });
-})
+}
 
 const getCourses = async function () {
   try {
     loading.value = await showLoading();
     noNetwork.value = false;
-    courses.value = await reportService.overview();
-    // console.log(courses.value);
+    overview.value = await reportService.overview();
     loading.value?.dismiss();
   } catch (error) {
     noNetwork.value = true
@@ -180,9 +163,6 @@ const getDates = function () {
     6: 'Sat'
   }
 
-  // console.log(courses.value);
-
-
   let seriesOverview = [];
 
 
@@ -193,7 +173,6 @@ const getDates = function () {
     let dateNow = new Date();
     const oneYearAgo = new Date((new Date(dateNow.getTime())).setDate(dateNow.getDate() - 180));
     const weekDaysDifference = oneYearAgo.getDay();
-    // const firstDayOfWeekAYearAgo = new Date(oneYearAgo.setDate(oneYearAgo.getDate() - weekDaysDifference))
     const firstDayOfWeekAYearAgo = new Date((new Date(oneYearAgo.getTime())).setDate(oneYearAgo.getDate() - weekDaysDifference));
     firstDayOfWeekAYearAgo.setDate(firstDayOfWeekAYearAgo.getDate() + y)
 
@@ -205,22 +184,16 @@ const getDates = function () {
     for (let x = 0; x <= 180 + weekDaysDifference; x += 7) {
       let date = new Date((new Date(firstDayOfWeekAYearAgo.getTime())).setDate(firstDayOfWeekAYearAgo.getDate() + x)) // new Date(firstDayOfWeekAYearAgo.setDate(firstDayOfWeekAYearAgo.getDate() + xIndex * 7))
       const currentRowDate = new Date((new Date(firstDayOfWeekAYearAgo.getTime())).setDate(firstDayOfWeekAYearAgo.getDate() + x))
-      const dateToFound = 
-      (currentRowDate.getFullYear() + '-' ) + 
-      (currentRowDate.getMonth() < 9 ? '0' + (currentRowDate.getMonth() + 1) : (currentRowDate.getMonth() + 1)) + '-' + 
-      (currentRowDate.getDate() < 10 ? '0' + currentRowDate.getDate() : currentRowDate.getDate())
-      // console.log(courses.value.overview.played)
-      let dataDay = courses.value.overview.played.filter(item => {
-        console.log('------------------------------', item.created_at.includes(dateToFound))
+      const dateToFound =
+        (currentRowDate.getFullYear() + '-') +
+        (currentRowDate.getMonth() < 9 ? '0' + (currentRowDate.getMonth() + 1) : (currentRowDate.getMonth() + 1)) + '-' +
+        (currentRowDate.getDate() < 10 ? '0' + currentRowDate.getDate() : currentRowDate.getDate())
+      let dataDay = overview.value.overview.played.filter(item => {
         return item.created_at.includes(dateToFound)
       })
 
-      console.log('++++++++', dataDay)
-
-
       labels.value[y][xIndex] = dateToFound;
 
-      
       data.push({ x: 'w' + xIndex, y: dataDay.length })
       xIndex++;
     }
@@ -229,45 +202,10 @@ const getDates = function () {
       name: daysOfWeek[firstDayOfWeekAYearAgo.getDay()],
       data: data
     },)
-
-
-    // let dateNow = new Date();
-    // let dateNow2 = new Date(dateNow.getTime());
-    // const oneYearAgo = new Date(dateNow.setDate(dateNow.getDate() - 20));
-    // const weekDaysDifference = oneYearAgo.getDay();
-    // const firstDayOfWeekAYearAgo = new Date(oneYearAgo.setDate(oneYearAgo.getDate() - weekDaysDifference))
-    // firstDayOfWeekAYearAgo.setDate(firstDayOfWeekAYearAgo.getDate() + y)
-
-
-    // let data = []
-    // labels.value[y] = [];
-    // let xIndex = 0;
-
-    // for (let x = 0; x <= 20 + weekDaysDifference; x += 7) {
-    //   let date = new Date(firstDayOfWeekAYearAgo.setDate(firstDayOfWeekAYearAgo.getDate() + xIndex * 7))
-    //   labels.value[y][xIndex] = date;
-    //   let dataDay = courses.value.overview.played.filter(item => true)
-    //   data.push({ x: 'w' + xIndex, y: parseInt(Math.random() * 100) })
-    //   xIndex++;
-    // }
-
-    // seriesOverview.push({
-    //   name: daysOfWeek[firstDayOfWeekAYearAgo.getDay()],
-    //   data: data
-    // },)
   }
 
   return seriesOverview;
 
-
-  // console.log(date, '=====', '-----')
-
-  // console.log(date, '=====', '-----', date.setFullYear(date.getFullYear() - 1), 'iiiiii', date)
-
-  // console.log('@@@', date.setDate(date.getDate() + 3), '***', date, daysOfWeek[date.getDay()])
-  // date.setDate( date.getDate() + 1 );
-  // date.setFullYear(date.getFullYear() - 1);
-  // $("#searchDateFrom").val((date.getMonth() ) + '/' + (date.getDate()) + '/' + (date.getFullYear()));
 }
 
 
@@ -283,7 +221,8 @@ const showLoading = async function () {
 }
 
 const handleRefresh = async (event: CustomEvent) => {
-  await getCourses();
+  await fillChart()
+
   event.target.complete();
 };
 
@@ -317,5 +256,6 @@ const handleRefresh = async (event: CustomEvent) => {
 
 ion-card {
   cursor: pointer;
+  color: #076200;
 }
 </style>

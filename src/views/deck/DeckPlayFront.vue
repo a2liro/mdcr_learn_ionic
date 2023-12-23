@@ -21,21 +21,6 @@
         </ion-button>
       </div>
       <div id="container" v-show="!noNetwork">
-        <ion-card>
-          <ion-card-header>
-            <ion-card-title>Audio:</ion-card-title>
-            <!-- <ion-card-subtitle>Frente:</ion-card-subtitle> -->
-          </ion-card-header>
-
-          <ion-card-content>
-            <audio controls autoplay v-if="card?.audiofile" ref="elementAudio">
-              <source :src="server + '/' + card?.audiofile" ref="elementSource" type="audio/mpeg">
-              Your browser does not support the audio element.
-            </audio>
-          </ion-card-content>
-        </ion-card>
-
-
         <div>
           <ion-card>
             <ion-card-header>
@@ -47,6 +32,18 @@
               <div class="quill-editor">
                 <div :ref="editor" class="user-editor" :id="`editor-${randId}`"></div>
               </div>
+            </ion-card-content>
+          </ion-card>
+          <ion-card>
+            <ion-card-header>
+              <ion-card-title>Audio:</ion-card-title>
+            </ion-card-header>
+
+            <ion-card-content>
+              <audio controls autoplay v-if="card?.audiofile" ref="elementAudio">
+                <source :src="server + '/' + card?.audiofile" ref="elementSource" type="audio/mpeg">
+                Your browser does not support the audio element.
+              </audio>
             </ion-card-content>
           </ion-card>
           <ion-card id="card-practice">
