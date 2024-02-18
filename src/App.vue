@@ -51,8 +51,7 @@ import {
 } from '@ionic/vue';
 import { onMounted, ref } from 'vue';
 import {
-  mailOutline,
-  mailSharp,
+  statsChartOutline,
   logOutOutline,
   schoolOutline
 } from 'ionicons/icons';
@@ -68,6 +67,13 @@ const appPages = [
     url: '/courses',
     iosIcon: schoolOutline,
     mdIcon: schoolOutline,
+  },
+
+  {
+    title: 'Relatórios',
+    url: '/reports/overview',
+    iosIcon: statsChartOutline,
+    mdIcon: statsChartOutline,
   },
 
   {

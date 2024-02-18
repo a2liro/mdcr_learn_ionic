@@ -50,6 +50,10 @@ const routes: Array<RouteRecordRaw> = [
     path: '/deck/play/back/:id',
     component: () => import ('../views/deck/DeckPlayBack.vue')
   },
+  {
+    path: '/reports/overview',
+    component: () => import ('../views/report/OverviewPage.vue')
+  },
 ]
 
 const router = createRouter({
