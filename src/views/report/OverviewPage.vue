@@ -58,6 +58,7 @@ import { refreshOutline } from 'ionicons/icons';
 
 import { ref } from 'vue';
 import server from '@/config/server';
+import LoginPageVue from '../user/LoginPage.vue';
 const overview = ref([])
 const noNetwork = ref(false)
 
@@ -114,6 +115,8 @@ const fillChart = async function() {
   await getCourses();
   series2.value = getDates();
 
+  console.log('series2', series2.value);
+
   chartBarRef.value.updateOptions({
     dataLabels: {
       enabled: true,
@@ -142,6 +145,7 @@ const getCourses = async function () {
     loading.value = await showLoading();
     noNetwork.value = false;
     overview.value = await reportService.overview();
+    console.log('overview', overview.value)
     loading.value?.dismiss();
   } catch (error) {
     noNetwork.value = true
@@ -192,9 +196,11 @@ const getDates = function () {
         return item.created_at.includes(dateToFound)
       })
 
+      console.log('dateToFound', dateToFound, dataDay[0]?.total, dataDay.length)
+
       labels.value[y][xIndex] = dateToFound;
 
-      data.push({ x: 'w' + xIndex, y: dataDay.length })
+      data.push({ x: 'w' + xIndex, y: dataDay[0]?.total ?? 0 })
       xIndex++;
     }
 

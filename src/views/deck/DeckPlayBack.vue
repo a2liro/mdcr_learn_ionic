@@ -89,9 +89,9 @@ import {
   IonCol,
   IonGrid,
   useIonRouter,
-onIonViewWillEnter,
-loadingController,
-toastController,
+  onIonViewWillEnter,
+  loadingController,
+  toastController,
 } from '@ionic/vue';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
