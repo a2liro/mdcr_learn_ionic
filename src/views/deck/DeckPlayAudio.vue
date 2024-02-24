@@ -13,7 +13,6 @@
       <ion-refresher slot="fixed" @ionRefresh="handleRefresh($event)">
         <ion-refresher-content></ion-refresher-content>
       </ion-refresher>
-      {{ currentDeck.is_english }}
       <div v-show="noNetwork" class="no-network">
         <h3>Não conseguimos conectar a internet</h3>
         <ion-button @click="refreshClick()">
@@ -99,9 +98,8 @@ const elementAudio = ref(null);
 onIonViewDidEnter(async () => {
   await getData()
   if (!currentDeck.value.is_english || currentDeck.value.is_english == 0) {
-    router.push('/deck/play/front/' + card.value.id)
+    router.replace('/deck/play/front/' + card.value.id)
   } else {
-    console.log(currentDeck.value.is_english)
     elementSource.value?.addEventListener('error', (event: Event) => {
       noNetwork.value = true
     })
@@ -142,8 +140,10 @@ const refreshClick = async (event: CustomEvent) => {
 };
 
 onIonViewWillLeave(() => {
-  elementAudio.value.pause();
-  elementAudio.value.currentTime = 0;
+  if (elementAudio.value) {
+    elementAudio.value.pause();
+    elementAudio.value.currentTime = 0;
+  }
 })
 
 

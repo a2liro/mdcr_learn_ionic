@@ -91,10 +91,51 @@ const chartOptions = ref(
     dataLabels: {
       enabled: false
     },
-    colors: ["#076200"],
+    // colors: ["#076200"],
     title: {
       text: 'Frequência',
     },
+    plotOptions: {
+              heatmap: {
+                radius: 1,
+                enableShades: true,
+                colorScale: {
+                  ranges: [{
+                      from: 0,
+                      to: 50,
+                      color: '#45f238'
+                    },
+                    {
+                      from: 51,
+                      to: 100,
+                      color: '#0fb302'
+                    },
+                    {
+                      from: 101,
+                      to: 150,
+                      color: '#0e9903'
+                    },
+                    {
+                      from: 151,
+                      to: 200,
+                      color: '#076200'
+                    },
+                    {
+                      from: 201,
+                      to: 300,
+                      color: '#064501'
+                    },
+                    {
+                      from: 301,
+                      to: 2000,
+                      color: '#e80000'
+                    },
+                  ],
+                },
+            
+              }
+            },
+
   }
 )
 
@@ -114,8 +155,6 @@ onIonViewDidEnter(async () => {
 const fillChart = async function() {
   await getCourses();
   series2.value = getDates();
-
-  console.log('series2', series2.value);
 
   chartBarRef.value.updateOptions({
     dataLabels: {
@@ -145,7 +184,6 @@ const getCourses = async function () {
     loading.value = await showLoading();
     noNetwork.value = false;
     overview.value = await reportService.overview();
-    console.log('overview', overview.value)
     loading.value?.dismiss();
   } catch (error) {
     noNetwork.value = true
@@ -195,8 +233,6 @@ const getDates = function () {
       let dataDay = overview.value.overview.played.filter(item => {
         return item.created_at.includes(dateToFound)
       })
-
-      console.log('dateToFound', dateToFound, dataDay[0]?.total, dataDay.length)
 
       labels.value[y][xIndex] = dateToFound;
 

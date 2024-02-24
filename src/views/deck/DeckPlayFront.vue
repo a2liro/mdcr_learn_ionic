@@ -3,7 +3,8 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button v-if="currentDeck.is_english == 0" text="Voltar" :defaultHref="`/courses/home/${currentDeck.course_id}`"></ion-back-button>
+          <ion-back-button v-if="currentDeck.is_english == '0'" text="Voltar 1"
+            :defaultHref="`/courses/home/${currentDeck.course_id}`"></ion-back-button>
           <ion-back-button v-else text="Voltar"></ion-back-button>
         </ion-buttons>
         <ion-title size="large">Play Deck Front</ion-title>
@@ -175,7 +176,6 @@ onIonViewDidEnter(async () => {
   if (!currentDeck.value.is_english || currentDeck.value.is_english == 0) {
     router.push('/deck/play/front/' + card.value.id)
   } else {
-    console.log(currentDeck.value.is_english)
     elementSource.value?.addEventListener('error', (event: Event) => {
       noNetwork.value = true
     })
@@ -308,8 +308,10 @@ function changed() {
 }
 
 onIonViewWillLeave(() => {
-  elementAudio.value?.pause();
-  elementAudio.value.currentTime = 0;
+  if (elementAudio.value) {
+    elementAudio.value.pause();
+    elementAudio.value.currentTime = 0;
+  }
 })
 
 
