@@ -22,8 +22,13 @@
         </ion-button>
       </div>
       <div id="container" v-else>
+        <div id="chart2">
+          <apexchart ref="chartBarRef2" type="heatmap" height="350" :options="chartOptions2" :series="series2">
+          </apexchart>
+        </div>
+
         <div id="chart">
-          <apexchart ref="chartBarRef" type="heatmap" height="350" :options="chartOptions" :series="series2"></apexchart>
+          <apexchart ref="chartBarRef" type="heatmap" height="350" :options="chartOptions" :series="series"></apexchart>
         </div>
       </div>
     </ion-content>
@@ -73,14 +78,78 @@ const options = ref(
   },
 )
 
-const series = ref(
-  [{
-    name: 'series-1',
-    data: [30, 40, 45, 50, 49, 60, 70, 91]
-  }]
-)
+// const series = ref(
+//   [{
+//     name: 'series-1',
+//     data: [30, 40, 45, 50, 49, 60, 70, 91]
+//   }]
+// )
 
 const series2 = ref<Object[]>([])
+const series = ref<Object[]>([])
+
+
+const chartOptions2 = ref(
+  {
+    chart: {
+      height: 350,
+      type: 'heatmap',
+    },
+    dataLabels: {
+      enabled: false
+    },
+    title: {
+      text: 'Frequência',
+    },
+    plotOptions: {
+      heatmap: {
+        radius: 1,
+        enableShades: true,
+        colorScale: {
+          ranges: [
+            {
+              from: 0,
+              to: 1,
+              color: '#eeeeee'
+            },
+            {
+              from: 1,
+              to: 50,
+              color: '#45f238'
+            },
+            {
+              from: 51,
+              to: 100,
+              color: '#0fb302'
+            },
+            {
+              from: 101,
+              to: 150,
+              color: '#0e9903'
+            },
+            {
+              from: 151,
+              to: 200,
+              color: '#076200'
+            },
+            {
+              from: 201,
+              to: 300,
+              color: '#064501'
+            },
+            {
+              from: 301,
+              to: 2000,
+              color: '#e80000'
+            },
+          ],
+        },
+
+      }
+    },
+
+  }
+)
 
 const chartOptions = ref(
   {
@@ -91,50 +160,55 @@ const chartOptions = ref(
     dataLabels: {
       enabled: false
     },
-    // colors: ["#076200"],
     title: {
-      text: 'Frequência',
+      text: 'A vencer',
     },
     plotOptions: {
-              heatmap: {
-                radius: 1,
-                enableShades: true,
-                colorScale: {
-                  ranges: [{
-                      from: 0,
-                      to: 50,
-                      color: '#45f238'
-                    },
-                    {
-                      from: 51,
-                      to: 100,
-                      color: '#0fb302'
-                    },
-                    {
-                      from: 101,
-                      to: 150,
-                      color: '#0e9903'
-                    },
-                    {
-                      from: 151,
-                      to: 200,
-                      color: '#076200'
-                    },
-                    {
-                      from: 201,
-                      to: 300,
-                      color: '#064501'
-                    },
-                    {
-                      from: 301,
-                      to: 2000,
-                      color: '#e80000'
-                    },
-                  ],
-                },
-            
-              }
+      heatmap: {
+        radius: 1,
+        enableShades: true,
+        colorScale: {
+          ranges: [
+            {
+              from: 0,
+              to: 1,
+              color: '#eeeeee'
             },
+            {
+              from: 1,
+              to: 50,
+              color: '#45f238'
+            },
+            {
+              from: 51,
+              to: 100,
+              color: '#0fb302'
+            },
+            {
+              from: 101,
+              to: 150,
+              color: '#0e9903'
+            },
+            {
+              from: 151,
+              to: 200,
+              color: '#076200'
+            },
+            {
+              from: 201,
+              to: 300,
+              color: '#064501'
+            },
+            {
+              from: 301,
+              to: 2000,
+              color: '#e80000'
+            },
+          ],
+        },
+
+      }
+    },
 
   }
 )
@@ -146,15 +220,40 @@ const loading = ref<HTMLIonLoadingElement>();
 //   loading.value = await showLoading();
 // })
 
+const chartBarRef2 = ref();
 const chartBarRef = ref();
+
 
 onIonViewDidEnter(async () => {
   await fillChart()
 })
 
-const fillChart = async function() {
+const fillChart = async function () {
   await getCourses();
-  series2.value = getDates();
+  series2.value = getDates2();
+  series.value = getDates();
+
+  chartBarRef2.value.updateOptions({
+    dataLabels: {
+      enabled: true,
+      formatter: function (value, opt) {
+        return value
+        if (!isNaN(value)) {
+          let newValue = new Intl.NumberFormat("pt-BR", {
+            maximumFractionDigits: 3,
+          }).format(value);
+          return newValue + " " + opt.config.series2[opt.seriesIndex].name;
+        } else {
+          return value;
+        }
+      },
+    },
+    tooltip: {
+      custom: function ({ series, seriesIndex, dataPointIndex, w }) {
+        return labels2.value[seriesIndex + 1][dataPointIndex] + ': ' + series[seriesIndex][dataPointIndex]
+      }
+    }
+  });
 
   chartBarRef.value.updateOptions({
     dataLabels: {
@@ -191,9 +290,10 @@ const getCourses = async function () {
   }
 }
 
+const labels2 = ref([]);
 const labels = ref([]);
 
-const getDates = function () {
+const getDates2 = function () {
 
   const daysOfWeek = {
     0: 'Sun',
@@ -205,7 +305,7 @@ const getDates = function () {
     6: 'Sat'
   }
 
-  let seriesOverview = [];
+  let seriesOverview2 = [];
 
 
 
@@ -220,7 +320,7 @@ const getDates = function () {
 
 
     let data = []
-    labels.value[y] = [];
+    labels2.value[y] = [];
     let xIndex = 0;
 
     for (let x = 0; x <= 180 + weekDaysDifference; x += 7) {
@@ -234,9 +334,87 @@ const getDates = function () {
         return item.created_at.includes(dateToFound)
       })
 
-      labels.value[y][xIndex] = dateToFound;
+      labels2.value[y][xIndex] = dateToFound;
 
       data.push({ x: 'w' + xIndex, y: dataDay[0]?.total ?? 0 })
+      xIndex++;
+    }
+
+    seriesOverview2.push({
+      name: daysOfWeek[firstDayOfWeekAYearAgo.getDay()],
+      data: data
+    },)
+  }
+
+  return seriesOverview2;
+
+}
+const getDates = function () {
+
+  const daysOfWeek = {
+    0: 'Sun',
+    1: 'Mon',
+    2: 'Tue',
+    3: 'Wed',
+    4: 'Thu',
+    5: 'Fri',
+    6: 'Sat'
+  }
+
+  let seriesOverview = [];
+  let dateNow = new Date();
+  const oneYearAgo = new Date((new Date(dateNow.getTime())).setDate(dateNow.getDate() - 1));
+
+  let overdues = 0;
+  overview.value.overview.to_play.map(item => {
+    if (new Date(item.nextshow) <= oneYearAgo) {
+      overdues = parseInt(overdues) + parseInt(item.total);
+    }
+  })
+
+  for (let y = 1; y <= 7; y++) {
+
+
+    const weekDaysDifference = oneYearAgo.getDay();
+    const firstDayOfWeekAYearAgo = new Date((new Date(oneYearAgo.getTime())).setDate(oneYearAgo.getDate() - weekDaysDifference));
+    firstDayOfWeekAYearAgo.setDate(firstDayOfWeekAYearAgo.getDate() + y)
+
+
+    let data = []
+    labels.value[y] = [];
+    let xIndex = 0;
+
+
+
+    for (let x = 0; x <= 187 + weekDaysDifference; x += 7) {
+      let date = new Date((new Date(firstDayOfWeekAYearAgo.getTime())).setDate(firstDayOfWeekAYearAgo.getDate() + x)) // new Date(firstDayOfWeekAYearAgo.setDate(firstDayOfWeekAYearAgo.getDate() + xIndex * 7))
+      const currentRowDate = new Date((new Date(firstDayOfWeekAYearAgo.getTime())).setDate(firstDayOfWeekAYearAgo.getDate() + x))
+      const dateToFound =
+        (currentRowDate.getFullYear() + '-') +
+        (currentRowDate.getMonth() < 9 ? '0' + (currentRowDate.getMonth() + 1) : (currentRowDate.getMonth() + 1)) + '-' +
+        (currentRowDate.getDate() < 10 ? '0' + currentRowDate.getDate() : currentRowDate.getDate())
+
+      let dataDay = overview.value.overview.to_play.filter(item => {
+        return item.nextshow.includes(dateToFound)
+      })
+
+
+      labels.value[y][xIndex] = dateToFound;
+
+      let today =
+        (dateNow.getFullYear() + '-') +
+        (dateNow.getMonth() < 9 ? '0' + (dateNow.getMonth() + 1) : (dateNow.getMonth() + 1)) + '-' +
+        (dateNow.getDate() < 10 ? '0' + dateNow.getDate() : dateNow.getDate())
+
+      if (dateToFound > today) {
+        data.push({ x: 'w' + xIndex, y: dataDay[0]?.total ?? 0 })
+      } else if (dateToFound == today) {
+        data.push({ x: 'w' + xIndex, y: parseInt(dataDay[0]?.total ?? 0) + overdues })
+      } else {
+        data.push({ x: 'w' + xIndex, y: 0 })
+      }
+
+
       xIndex++;
     }
 
@@ -271,14 +449,14 @@ const handleRefresh = async (event: CustomEvent) => {
 </script>
 
 <style scoped>
-#container {
+/* #container {
   text-align: center;
   position: absolute;
   left: 0;
   right: 0;
   top: 50%;
   transform: translateY(-50%);
-}
+} */
 
 #container strong {
   font-size: 20px;
