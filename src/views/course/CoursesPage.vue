@@ -6,7 +6,7 @@
           <ion-menu-button></ion-menu-button>
           <!-- <ion-back-button defaultHref="/home" text="Voltar"></ion-back-button> -->
         </ion-buttons>
-        <ion-title>Cursos</ion-title>
+        <ion-title>Cursos 2222</ion-title>
       </ion-toolbar>
     </ion-header>
 
@@ -66,6 +66,7 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonIcon,
+onIonViewWillEnter,
 } from '@ionic/vue';
 import courseService from '@/services/courseService';
 import { refreshOutline } from 'ionicons/icons';
@@ -83,13 +84,18 @@ const loading = ref<HTMLIonLoadingElement>();
 //   loading.value = await showLoading();
 // })
 
+onIonViewWillEnter(async () => {
+  loading.value = await showLoading();
+  loading.value.dismiss();
+});
+
 onIonViewDidEnter(async () => {
   await getCourses();
 })
 
 const getCourses = async function () {
   try {
-    loading.value = await showLoading();
+    // loading.value = await showLoading();
     noNetwork.value = false;
     courses.value = await courseService.getCourses();
     loading.value?.dismiss();
@@ -104,7 +110,8 @@ const showLoading = async function () {
   const loading = await loadingController.create({
     message: 'Loading...',
     mode: 'ios',
-    translucent: true,
+    translucent: false,
+    cssClass: 'custom-loading',
   });
 
   loading.present();

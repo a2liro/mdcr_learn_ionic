@@ -146,7 +146,7 @@ const alertButtons = ref([
 ])
 
 onIonViewWillEnter(async () => {
-  // loading.value = await showLoading();
+  loading.value = await showLoading();
 })
 
 onIonViewDidEnter(async () => {
@@ -155,7 +155,7 @@ onIonViewDidEnter(async () => {
 
 const getAllData = async function () {
   try {
-    loading.value = await showLoading();
+    // loading.value = await showLoading();
     noNetwork.value = false;
     course.value = await courseService.getCourseData(route.params.id);
     course.value.decksInProgress = course.value.decks.filter((item) => item.isPlaying == true)
@@ -199,7 +199,8 @@ const showLoading = async function () {
   const loading = await loadingController.create({
     message: 'Loading...',
     mode: 'ios',
-    translucent: true,
+    translucent: false,
+    cssClass: 'custom-loading',
   });
 
   loading.present();
@@ -210,7 +211,8 @@ const showDecksByCategory = async function (categoryId: any) {
   const loading = await loadingController.create({
     message: 'Loading...',
     mode: 'ios',
-    translucent: true,
+    translucent: false,
+    cssClass: 'custom-loading',
     duration: 300
   });
 
@@ -291,6 +293,8 @@ ion-badge {
 </style>
 
 <style>
+
+
 .custom-alert .alert-button-group {
   padding: 8px;
 }

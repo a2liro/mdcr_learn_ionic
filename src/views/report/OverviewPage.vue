@@ -313,7 +313,7 @@ const getDates2 = function () {
 
 
     let dateNow = new Date();
-    const oneYearAgo = new Date((new Date(dateNow.getTime())).setDate(dateNow.getDate() - 180));
+    const oneYearAgo = new Date((new Date(dateNow.getTime())).setDate(dateNow.getDate() - 105));
     const weekDaysDifference = oneYearAgo.getDay();
     const firstDayOfWeekAYearAgo = new Date((new Date(oneYearAgo.getTime())).setDate(oneYearAgo.getDate() - weekDaysDifference));
     firstDayOfWeekAYearAgo.setDate(firstDayOfWeekAYearAgo.getDate() + y)
@@ -323,7 +323,7 @@ const getDates2 = function () {
     labels2.value[y] = [];
     let xIndex = 0;
 
-    for (let x = 0; x <= 180 + weekDaysDifference; x += 7) {
+    for (let x = 0; x <= 105 + weekDaysDifference; x += 7) {
       let date = new Date((new Date(firstDayOfWeekAYearAgo.getTime())).setDate(firstDayOfWeekAYearAgo.getDate() + x)) // new Date(firstDayOfWeekAYearAgo.setDate(firstDayOfWeekAYearAgo.getDate() + xIndex * 7))
       const currentRowDate = new Date((new Date(firstDayOfWeekAYearAgo.getTime())).setDate(firstDayOfWeekAYearAgo.getDate() + x))
       const dateToFound =
@@ -386,7 +386,7 @@ const getDates = function () {
 
 
 
-    for (let x = 0; x <= 187 + weekDaysDifference; x += 7) {
+    for (let x = 0; x <= 105 + weekDaysDifference; x += 7) {
       let date = new Date((new Date(firstDayOfWeekAYearAgo.getTime())).setDate(firstDayOfWeekAYearAgo.getDate() + x)) // new Date(firstDayOfWeekAYearAgo.setDate(firstDayOfWeekAYearAgo.getDate() + xIndex * 7))
       const currentRowDate = new Date((new Date(firstDayOfWeekAYearAgo.getTime())).setDate(firstDayOfWeekAYearAgo.getDate() + x))
       const dateToFound =
@@ -433,7 +433,8 @@ const showLoading = async function () {
   const loading = await loadingController.create({
     message: 'Loading...',
     mode: 'ios',
-    translucent: true,
+    translucent: false,
+    cssClass: 'custom-loading',
   });
 
   loading.present();

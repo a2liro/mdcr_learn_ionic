@@ -114,7 +114,8 @@ const showLoading = async function (duration) {
   const loading = await loadingController.create({
     message: 'Loading...',
     mode: 'ios',
-    translucent: true,
+    translucent: false,
+    cssClass: 'custom-loading',
     duration: duration,
   });
 
