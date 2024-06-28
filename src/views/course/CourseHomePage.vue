@@ -35,18 +35,28 @@
         <swiper :slides-per-view="2.2" :loop="false" id="swiper-decks">
           <swiper-slide v-for="deck in course.decksInProgressToShow" :key="deck">
 
-            <ion-card :id="'present-alert' + deck.id">
-              <ion-item class="badge-item-playing">
-                <ion-badge slot="start" color="success" class="badge-item-playing-left">{{ deck.totalNewCards
-                }}</ion-badge>
-                <ion-badge slot="end" color="warning" class="badge-item-playing-right">{{ deck.totalCardsToPlayAgain
-                }}</ion-badge>
+            <ion-card>
+              <div :id="'present-alert' + deck.id">
+                <ion-item class="badge-item-playing">
+                  <ion-badge slot="start" color="success" class="badge-item-playing-left">{{ deck.totalNewCards
+                    }}</ion-badge>
+                  <ion-badge slot="end" color="warning" class="badge-item-playing-right">{{ deck.totalCardsToPlayAgain
+                    }}</ion-badge>
+                </ion-item>
+
+                <img alt="deck logo" :src="server + '/' + deck.thumbnail" />
+                <ion-card-header class="card-deck-header">
+                  <ion-card-subtitle>{{ deck.name }}</ion-card-subtitle>
+                </ion-card-header>
+              </div>
+
+              <ion-item class="badge-item-reset">
+                <ion-badge slot="end" color="danger" class="badge-item-reset-right" ref="resetButton"
+                  :id="'reset-alert-' + deck.id">
+                  <ion-icon :icon="refreshOutline"></ion-icon>
+                </ion-badge>
               </ion-item>
 
-              <img alt="deck logo" :src="server + '/' + deck.thumbnail" />
-              <ion-card-header class="card-deck-header">
-                <ion-card-subtitle>{{ deck.name }}</ion-card-subtitle>
-              </ion-card-header>
             </ion-card>
             <ion-alert :trigger="'present-alert' + deck.id" class="custom-alert" header="Continuar estudos?"
               :buttons="alertButtons" @didDismiss="startNewDeck($event, deck.id)"></ion-alert>
@@ -109,6 +119,8 @@ import {
   IonRefresher,
   IonRefresherContent,
   IonButton,
+  createGesture,
+  alertController,
 } from '@ionic/vue';
 import courseService from '@/services/courseService';
 import 'swiper/css';
@@ -149,9 +161,85 @@ onIonViewWillEnter(async () => {
   loading.value = await showLoading();
 })
 
+const alertButtonsReset = [
+  {
+    text: 'Cancelar',
+    role: 'cancel',
+    cssClass: 'alert-button-cancel',
+  },
+  {
+    text: 'Confirmar',
+    role: 'confirm',
+    handler: async () => {
+      try {
+        noNetwork.value = false;
+        loading.value = await showLoading()
+        loading.value?.present();
+        await deckService.restart(deckToReset.value[0].id);
+        const card = await deckService.playDeck(deckToReset.value[0].id)
+
+        loading.value?.dismiss();
+        router.push('/deck/play/' + deckToReset.value[0].id)
+      } catch (error) {
+        noNetwork.value = true
+        loading.value?.dismiss();
+      }
+
+    },
+  },
+];
+
+const resetButton = ref()
+const deckToReset = ref({});
+
+const DOUBLE_CLICK_THRESHOLD = 500;
+
+let lastOnStart = 0;
+let currentOffset = 0;
+const onStart = async (deckId) => {
+
+  const now = Date.now();
+
+  if (Math.abs(now - lastOnStart) <= DOUBLE_CLICK_THRESHOLD) {
+    deckToReset.value = course.value.decksInProgressToShow.filter((item) => item.id == deckId)
+
+    const alert = await alertController.create({
+      header: 'Reiniciar deck',
+      subHeader: deckToReset.value[0].name,
+      message: 'Esta ação é irreversível!',
+      buttons: alertButtonsReset,
+    });
+
+    await alert.present();
+
+    lastOnStart = 0;
+  } else {
+    lastOnStart = now;
+  }
+};
+
+
 onIonViewDidEnter(async () => {
   await getAllData();
+
+  resetButton.value.map((item, index) => {
+    const idParts = item.$el.id.split('-')
+
+    const gesture = createGesture({
+      el: item.$el,
+      threshold: 0,
+      onStart: () => onStart(idParts[2]),
+      gestureName: 'double-click',
+    });
+
+    gesture.enable();
+  })
+
+
 });
+
+
+
 
 const getAllData = async function () {
   try {
@@ -287,14 +375,26 @@ ion-alert.custom-alert {
   margin: 0;
 }
 
+.badge-item-reset {
+  height: 2.2em;
+  position: absolute;
+  --ion-item-background: #ffffff00;
+  bottom: 0.7em;
+  width: 100%;
+}
+
+.badge-item-reset-right {
+  position: relative;
+  left: -0.1em;
+  margin: 0;
+}
+
 ion-badge {
   opacity: 0.9;
 }
 </style>
 
 <style>
-
-
 .custom-alert .alert-button-group {
   padding: 8px;
 }
