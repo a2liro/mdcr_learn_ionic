@@ -3,7 +3,9 @@
     <ion-header>
       <ion-toolbar>
         <ion-buttons slot="start">
-          <ion-back-button text="Voltar"></ion-back-button>
+          <ion-back-button v-if="currentDeck.is_english == '0'" text="Voltar 1"
+            :defaultHref="`/courses/home/${currentDeck.course_id}`"></ion-back-button>
+          <ion-back-button v-else text="Voltar"></ion-back-button>
         </ion-buttons>
         <ion-title size="large">Play Deck Front</ion-title>
       </ion-toolbar>
@@ -34,7 +36,7 @@
               </div>
             </ion-card-content>
           </ion-card>
-          <ion-card>
+          <ion-card v-show="currentDeck.is_english == 1">
             <ion-card-header>
               <ion-card-title>Audio:</ion-card-title>
             </ion-card-header>
@@ -46,7 +48,7 @@
               </audio>
             </ion-card-content>
           </ion-card>
-          <ion-card id="card-practice">
+          <ion-card id="card-practice" v-show="currentDeck.is_english == 1">
             <ion-card-header>
               <ion-card-title>Praticar</ion-card-title>
               <ion-card-subtitle>Resultado:
@@ -112,10 +114,15 @@ import {
   IonRefresher,
   IonRefresherContent,
   onIonViewWillLeave,
+  useIonRouter,
 } from '@ionic/vue';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
 import { micOutline, square, chevronForward, refreshOutline } from 'ionicons/icons';
+import deckStore from '@/stores/deckStore';
+
+const currentDeck = ref([])
+
 
 
 import { ref, watch } from 'vue';
@@ -131,6 +138,8 @@ import Quill from 'quill';
 
 import { SpeechRecognition } from "@capacitor-community/speech-recognition";
 import { isPlatform } from '@ionic/vue';
+
+const router = useIonRouter();
 
 
 const editor = ref();
@@ -164,13 +173,20 @@ onIonViewWillEnter(async () => {
 onIonViewDidEnter(async () => {
 
   await getData()
-  elementSource.value?.addEventListener('error', (event) => {
-    noNetwork.value = true
-  })
+  if (!currentDeck.value.is_english || currentDeck.value.is_english == 0) {
+    router.push('/deck/play/front/' + card.value.id)
+  } else {
+    elementSource.value?.addEventListener('error', (event: Event) => {
+      noNetwork.value = true
+    })
+  }
 
 });
 
 const getData = async function () {
+
+  currentDeck.value = await deckStore.getCurrentDeck();
+
 
   card.value = await cardStore.getCard();
 
@@ -226,7 +242,8 @@ const showLoading = async function () {
   const loading = await loadingController.create({
     message: 'Loading...',
     mode: 'ios',
-    translucent: true,
+    translucent: false,
+    cssClass: 'custom-loading',
   });
 
   loading.present();
@@ -292,8 +309,10 @@ function changed() {
 }
 
 onIonViewWillLeave(() => {
-  elementAudio.value?.pause();
-  elementAudio.value.currentTime = 0;
+  if (elementAudio.value) {
+    elementAudio.value.pause();
+    elementAudio.value.currentTime = 0;
+  }
 })
 
 

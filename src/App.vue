@@ -225,4 +225,12 @@ ion-item.selected {
   top: 50%;
   transform: translateY(-50%);
 }
+
+.custom-loading {
+  --backdrop-opacity: 1
+}
+
+ion-backdrop {
+  background-color: #959494;
+}
 </style>

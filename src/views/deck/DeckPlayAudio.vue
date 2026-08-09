@@ -70,6 +70,7 @@ import {
   IonRefresher,
   IonRefresherContent,
   onIonViewWillLeave,
+  useIonRouter,
 } from '@ionic/vue';
 import { chevronForward, refreshOutline } from 'ionicons/icons';
 
@@ -81,6 +82,9 @@ import deckStore from '@/stores/deckStore';
 import { ref } from 'vue';
 import server from '@/config/server';
 import { useRoute } from 'vue-router';
+
+const router = useIonRouter();
+
 const route = useRoute();
 const card = ref([])
 const currentDeck = ref([])
@@ -93,9 +97,13 @@ const elementAudio = ref(null);
 
 onIonViewDidEnter(async () => {
   await getData()
-  elementSource.value?.addEventListener('error', (event: Event) => {
-    noNetwork.value = true
-  })
+  if (!currentDeck.value.is_english || currentDeck.value.is_english == 0) {
+    router.replace('/deck/play/front/' + card.value.id)
+  } else {
+    elementSource.value?.addEventListener('error', (event: Event) => {
+      noNetwork.value = true
+    })
+  }
 });
 
 const getData = async function () {
@@ -116,7 +124,8 @@ const showLoading = async function () {
   const loading = await loadingController.create({
     message: 'Loading...',
     mode: 'ios',
-    translucent: true,
+    translucent: false,
+    cssClass: 'custom-loading',
   });
 
   loading.present();
@@ -132,8 +141,10 @@ const refreshClick = async (event: CustomEvent) => {
 };
 
 onIonViewWillLeave(() => {
-  elementAudio.value.pause();
-  elementAudio.value.currentTime = 0;
+  if (elementAudio.value) {
+    elementAudio.value.pause();
+    elementAudio.value.currentTime = 0;
+  }
 })
 
 

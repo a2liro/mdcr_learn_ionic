@@ -9,7 +9,7 @@ const deckService = {
 
     playDeck: async function (id: any) {
         const user = await userStore.getUser();
-        
+
         const config = {
             headers: {
                 Accept: "application/json",
@@ -17,9 +17,22 @@ const deckService = {
             },
         };
         const response = await axios.get(server + '/api/decks/play/' + id, config);
-        
+
         await cardStore.setCard(response.data.card);
         return response.data.card
+    },
+
+    restart: async function (deckId: any) {
+        const user = await userStore.getUser();
+
+        const config = {
+            headers: {
+                Accept: "application/json",
+                Authorization: 'Baerer ' + user.token
+            },
+        };
+        const response = await axios.get(`${server}/api/decks/${deckId}/restart`, config);
+        return response.data
     },
 }
 

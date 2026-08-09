@@ -89,9 +89,9 @@ import {
   IonCol,
   IonGrid,
   useIonRouter,
-onIonViewWillEnter,
-loadingController,
-toastController,
+  onIonViewWillEnter,
+  loadingController,
+  toastController,
 } from '@ionic/vue';
 import 'swiper/css';
 import '@ionic/vue/css/ionic-swiper.css';
@@ -183,7 +183,8 @@ const showLoading = async function () {
   const loading = await loadingController.create({
     message: 'Loading...',
     mode: 'ios',
-    translucent: true,
+    translucent: false,
+    cssClass: 'custom-loading',
   });
 
   loading.present();
